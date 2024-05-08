@@ -4,7 +4,7 @@
 
 - [Installation](#installation)
 - [Run](#run)
-- [Pushingcode](#pushingcode)
+- [Pushing code](#pushing-code)
 
 ## Installation
 
