@@ -15,6 +15,7 @@ import { Colors } from "../theme/Theme";
 import VerifyOTP from "./Authentication/Signup/VerifyOTP";
 import InputInfo from "./Authentication/Signup/InputInfo";
 import UserInfo from "./Profiles/UserInfo/UserInfo";
+import AssessmentHistory from "./Profiles/AssessmentHistory/AssessmentHistory";
 
 const Stack = createNativeStackNavigator();
 
@@ -114,6 +115,15 @@ const Navigation = () => {
         options={{
           title: "",
           headerTransparent: true,
+        }}
+      />
+      <Stack.Screen
+        name="AssessmentHistory"
+        component={AssessmentHistory}
+        options={{
+          title: "",
+          headerTransparent: true,
+          headerTintColor: colorMode === "dark" ? Colors.white : Colors.black,
         }}
       />
     </Stack.Navigator>

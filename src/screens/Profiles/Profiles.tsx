@@ -137,7 +137,7 @@ const Profiles = ({ navigation }: any) => {
           justifyContent: "space-between",
           alignItems: "center",
         }}
-        onPress={() => navigation.navigate("HistoryDiagnostic")}
+        onPress={() => navigation.navigate("AssessmentHistory")}
       >
         <View
           style={{
