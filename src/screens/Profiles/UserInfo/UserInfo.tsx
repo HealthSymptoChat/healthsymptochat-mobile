@@ -8,6 +8,7 @@ import {
   Radio,
   Button,
   useColorMode,
+  StatusBar,
 } from "native-base";
 import React, { useState } from "react";
 import { AntDesign, MaterialIcons, FontAwesome } from "@expo/vector-icons";
@@ -70,6 +71,10 @@ const UserInfo = () => {
       }}
       style={{ height: "100%", width: "100%", padding: 20 }}
     >
+      <StatusBar
+        barStyle={colorMode === "dark" ? "light-content" : "dark-content"}
+        backgroundColor={colorMode === "dark" ? Colors.black : Colors.white}
+      />
       <View
         width={width + 60}
         height={width + 40}

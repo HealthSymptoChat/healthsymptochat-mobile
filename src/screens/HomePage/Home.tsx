@@ -1,15 +1,20 @@
-import { SafeAreaView, StyleSheet, Text, View } from "react-native";
+import { View, Text } from "native-base";
 import React from "react";
-import { Button } from "native-base";
 
 const Home = ({ navigation }: any) => {
   return (
-    <SafeAreaView>
+    <View
+      _dark={{
+        bg: "dark.100",
+      }}
+      _light={{
+        bg: "light.50",
+      }}
+      style={{ height: "100%", width: "100%" }}
+    >
       <Text>Home</Text>
-    </SafeAreaView>
+    </View>
   );
 };
 
 export default Home;
-
-const styles = StyleSheet.create({});
