@@ -57,16 +57,6 @@ const TabBar = () => {
           ),
         }}
       />
-      <Tab.Screen
-        name="Settings"
-        component={Setting}
-        options={{
-          tabBarLabel: "Cài đặt",
-          tabBarIcon: ({ color }) => (
-            <Icon as={AntDesign} name="setting" color={color} size={5} />
-          ),
-        }}
-      />
     </Tab.Navigator>
   );
 };

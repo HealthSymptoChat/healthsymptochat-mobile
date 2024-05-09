@@ -95,6 +95,16 @@ const InputInfo = () => {
       <Radio.Group
         name="radioGroup"
         value={gender}
+        _radio={{
+          borderColor: Colors.primaryMintDark,
+          _checked: {
+            _icon: {
+              color: Colors.primaryMintDark,
+              borderRadius: "full",
+            },
+            borderColor: Colors.primaryMintDark,
+          },
+        }}
         onChange={(nextValue) => setGender(nextValue)}
       >
         <View
