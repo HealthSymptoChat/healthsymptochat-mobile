@@ -14,6 +14,7 @@ import { useColorMode } from "native-base";
 import { Colors } from "../theme/Theme";
 import VerifyOTP from "./Authentication/Signup/VerifyOTP";
 import InputInfo from "./Authentication/Signup/InputInfo";
+import UserInfo from "./Profiles/UserInfo/UserInfo";
 
 const Stack = createNativeStackNavigator();
 
@@ -105,6 +106,14 @@ const Navigation = () => {
             backgroundColor: colorMode === "dark" ? Colors.black : Colors.white,
           },
           headerTintColor: colorMode === "dark" ? Colors.white : Colors.black,
+        }}
+      />
+      <Stack.Screen
+        name="UserInfo"
+        component={UserInfo}
+        options={{
+          title: "",
+          headerTransparent: true,
         }}
       />
     </Stack.Navigator>

@@ -29,7 +29,7 @@ const Profiles = ({ navigation }: any) => {
           justifyContent: "space-between",
           alignItems: "center",
         }}
-        onPress={() => navigation.navigate("BasicInfo")}
+        onPress={() => navigation.navigate("UserInfo")}
       >
         <View
           style={{
