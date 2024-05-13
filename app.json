@@ -19,7 +19,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.minhdat2003.healthsymptochatmobile"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -34,6 +35,7 @@
     },
     "updates": {
       "url": "https://u.expo.dev/179fb1ad-051d-42f1-bb8f-4ff59397dcfb"
-    }
+    },
+    "scheme": "com.minhdat2003.healthsymptochatmobile"
   }
 }

@@ -15,14 +15,25 @@ import { useEffect, useState } from "react";
 import { Octicons } from "@expo/vector-icons";
 import React from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import {
+  GoogleSignin,
+  statusCodes,
+} from "@react-native-google-signin/google-signin";
 
 const { width, height } = Dimensions.get("screen");
 
+GoogleSignin.configure({
+  webClientId:
+    "707852780019-q1st77n467s9oakiob88qi6fe0olpbr1.apps.googleusercontent.com",
+});
 const Login = ({ navigation }: any) => {
   const { colorMode } = useColorMode();
   const [phone, setPhone] = useState<String>("");
   const [password, setPassword] = useState<String>("");
   const [showPassword, setShowPassword] = useState<boolean>(false);
+
+  // useEffect(() => {
+  // }, []);
 
   const handleShowPassword = () => {
     setShowPassword(!showPassword);
@@ -30,6 +41,25 @@ const Login = ({ navigation }: any) => {
 
   const handleLogin = () => {
     console.log(phone, password);
+  };
+
+  const onGoogleButtonPress = async () => {
+    try {
+      await GoogleSignin.hasPlayServices();
+      console.log("has play service");
+      const userInfo = await GoogleSignin.signIn();
+      console.log(userInfo);
+    } catch (error: any) {
+      if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+        // user cancelled the login flow
+      } else if (error.code === statusCodes.IN_PROGRESS) {
+        // operation (e.g. sign in) is in progress already
+      } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+        // play services not available or outdated
+      } else {
+        console.log("error", error);
+      }
+    }
   };
 
   return (
@@ -126,6 +156,7 @@ const Login = ({ navigation }: any) => {
             variant="outline"
             _text={{ color: Colors.primaryMintDark }}
             _pressed={{ opacity: 0.7 }}
+            onPress={() => onGoogleButtonPress()}
           >
             <View style={styles.socialButton}>
               <Image
