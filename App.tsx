@@ -1,9 +1,4 @@
 import { StyleSheet } from "react-native";
-import {
-  DarkTheme,
-  NavigationContainer,
-  DefaultTheme,
-} from "@react-navigation/native";
 import { NativeBaseProvider, StatusBar, useColorMode } from "native-base";
 import React from "react";
 import { Colors } from "./src/theme/Theme";
@@ -23,11 +18,7 @@ export default function App() {
             barStyle={colorMode === "dark" ? "light-content" : "dark-content"}
             backgroundColor={colorMode === "dark" ? Colors.black : Colors.white}
           />
-          <NavigationContainer
-            theme={colorMode === "dark" ? DarkTheme : DefaultTheme}
-          >
-            <Navigation />
-          </NavigationContainer>
+          <Navigation />
         </NativeBaseProvider>
       </AxiosProvider>
     </AuthProvider>

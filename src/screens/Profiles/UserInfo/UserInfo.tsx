@@ -9,13 +9,18 @@ import {
   Button,
   useColorMode,
   StatusBar,
+  useToast,
 } from "native-base";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { AntDesign, MaterialIcons, FontAwesome } from "@expo/vector-icons";
 import { Colors } from "../../../theme/Theme";
 import { Dimensions } from "react-native";
 import { CalendarDate } from "react-native-paper-dates/lib/typescript/Date/Calendar";
 import { DatePickerModal, registerTranslation } from "react-native-paper-dates";
+import { AxiosContext } from "../../../context/AxiosContext";
+import { AuthContext } from "../../../context/AuthContext";
+import * as SecureStore from "expo-secure-store";
+import CustomToast from "../../../components/CustomToast";
 
 registerTranslation("vi", {
   save: "Lưu",
@@ -40,6 +45,9 @@ const { width, height } = Dimensions.get("window");
 
 const UserInfo = () => {
   const { colorMode, toggleColorMode } = useColorMode();
+  const { authAxios }: any = useContext(AxiosContext);
+  const authContext: any = useContext(AuthContext);
+  const toast = useToast();
   const [openEdit, setOpenEdit] = useState<boolean>(false);
   const [name, setName] = useState<string>("John Doe");
   const [gender, setGender] = useState<string>("male");
@@ -60,6 +68,30 @@ const UserInfo = () => {
   const handleEditUserInfo = () => {
     setOpenEdit(false);
     console.log(name, dob, gender);
+  };
+
+  const logout = async () => {
+    await authContext.logout();
+    try {
+      await authAxios.get("/auth/logout");
+    } catch (error) {
+      console.log(error);
+    } finally {
+      await SecureStore.deleteItemAsync("accessToken");
+      await SecureStore.deleteItemAsync("refreshToken");
+      await SecureStore.deleteItemAsync("user");
+      toast.show({
+        render: () => (
+          <CustomToast
+            message="Đăng xuất thành công"
+            state="success"
+            onClose={() => {
+              toast.closeAll();
+            }}
+          />
+        ),
+      });
+    }
   };
   return (
     <View
@@ -285,6 +317,7 @@ const UserInfo = () => {
           fontWeight: "bold",
           color: Colors.white,
         }}
+        onPress={logout}
         rightIcon={
           <Icon
             as={MaterialIcons}

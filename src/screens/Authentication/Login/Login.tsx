@@ -8,17 +8,21 @@ import {
   ScrollView,
   View,
   useColorMode,
+  useToast,
 } from "native-base";
 import { Dimensions, SafeAreaView, StyleSheet } from "react-native";
 import { Colors } from "../../../theme/Theme";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Octicons } from "@expo/vector-icons";
 import React from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SecureStore from "expo-secure-store";
 import {
   GoogleSignin,
   statusCodes,
 } from "@react-native-google-signin/google-signin";
+import { AxiosContext } from "../../../context/AxiosContext";
+import { AuthContext } from "../../../context/AuthContext";
+import CustomToast from "../../../components/CustomToast";
 
 const { width, height } = Dimensions.get("screen");
 
@@ -28,9 +32,12 @@ GoogleSignin.configure({
 });
 const Login = ({ navigation }: any) => {
   const { colorMode } = useColorMode();
-  const [phone, setPhone] = useState<String>("");
-  const [password, setPassword] = useState<String>("");
+  const toast = useToast();
+  const [username, setUsername] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  const authContext: any = useContext(AuthContext);
+  const { publicAxios }: any = useContext(AxiosContext);
 
   // useEffect(() => {
   // }, []);
@@ -39,23 +46,140 @@ const Login = ({ navigation }: any) => {
     setShowPassword(!showPassword);
   };
 
-  const handleLogin = () => {
-    console.log(phone, password);
+  const handleLogin = async () => {
+    console.log(username, password);
+    try {
+      if (!username || !password) {
+        toast.show({
+          render: () => (
+            <CustomToast
+              message="Vui lòng nhập đầy đủ thông tin"
+              state="error"
+              onClose={() => {
+                toast.closeAll();
+              }}
+            />
+          ),
+        });
+        return;
+      }
+      const response = await publicAxios.post("/auth/login", {
+        username: username,
+        password: password,
+      });
+      if (response.data) {
+        const { tokens, user } = response.data;
+        SecureStore.setItemAsync("accessToken", tokens.accessToken);
+        SecureStore.setItemAsync("refreshToken", tokens.refreshToken);
+        SecureStore.setItemAsync("user", JSON.stringify(user));
+        authContext.setAuthState({
+          accessToken: tokens.accessToken,
+          refreshToken: tokens.refreshToken,
+          authenticated: true,
+          user,
+        });
+        toast.show({
+          render: () => (
+            <CustomToast
+              message="Đăng nhập thành công"
+              state="success"
+              onClose={() => {
+                toast.closeAll();
+              }}
+            />
+          ),
+        });
+      } else {
+        toast.show({
+          render: () => (
+            <CustomToast
+              message="Đăng nhập thất bại"
+              state="error"
+              onClose={() => {
+                toast.closeAll();
+              }}
+            />
+          ),
+        });
+      }
+    } catch (error) {
+      console.log("Login failed", error);
+      toast.show({
+        render: () => (
+          <CustomToast
+            message="Đăng nhập thất bại"
+            state="error"
+            onClose={() => {
+              toast.closeAll();
+            }}
+          />
+        ),
+      });
+    }
   };
 
   const onGoogleButtonPress = async () => {
     try {
       await GoogleSignin.hasPlayServices();
-      console.log("has play service");
       const userInfo = await GoogleSignin.signIn();
-      console.log(userInfo);
+      const user = {
+        email: userInfo.user.email,
+        name: userInfo.user.name,
+        photo: userInfo.user.photo,
+      };
+      console.log(user);
+
+      const response = publicAxios.post("/auth/google", user);
+      try {
+        if (response.message === "success") {
+          console.log("success");
+          const { accessToken, refreshToken, user } = response.data;
+          await SecureStore.setItemAsync("accessToken", accessToken);
+          await SecureStore.setItemAsync("refreshToken", refreshToken);
+          await SecureStore.setItemAsync("user", JSON.stringify(user));
+          authContext.setAuthState({
+            accessToken,
+            refreshToken,
+            authenticated: true,
+            user,
+          });
+          toast.show({
+            render: () => (
+              <CustomToast
+                message="Đăng nhập thành công"
+                state="success"
+                onClose={() => {
+                  toast.closeAll();
+                }}
+              />
+            ),
+          });
+        } else {
+          toast.show({
+            render: () => (
+              <CustomToast
+                message="Đăng nhập thất bại"
+                state="error"
+                onClose={() => {
+                  toast.closeAll();
+                }}
+              />
+            ),
+          });
+        }
+      } catch (error: any) {
+        console.log("Login failed", error);
+      }
     } catch (error: any) {
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
         // user cancelled the login flow
+        console.log("cancelled");
       } else if (error.code === statusCodes.IN_PROGRESS) {
         // operation (e.g. sign in) is in progress already
+        console.log("in progress");
       } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
         // play services not available or outdated
+        console.log("play services not available");
       } else {
         console.log("error", error);
       }
@@ -111,7 +235,7 @@ const Login = ({ navigation }: any) => {
         <Input
           variant="rounded"
           placeholder="Nhập tên người dùng"
-          onChange={(e) => setPhone(e.nativeEvent.text)}
+          onChange={(e) => setUsername(e.nativeEvent.text)}
         />
         <Text fontSize="md" style={{ margin: 10 }}>
           Mật khẩu

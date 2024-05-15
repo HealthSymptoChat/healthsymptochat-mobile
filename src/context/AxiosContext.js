@@ -4,19 +4,14 @@ import { AuthContext } from "./AuthContext";
 import createAuthRefreshInterceptor from "axios-auth-refresh";
 import * as SecureStore from "expo-secure-store";
 
-interface AxiosContextType {
-  authAxios: AxiosInstance;
-  publicAxios: AxiosInstance;
-}
-
-const AxiosContext = createContext<AxiosContextType | null>(null);
+const AxiosContext = createContext(null);
 
 const { Provider } = AxiosContext;
 
-const AxiosProvider = ({ children }: any) => {
+const AxiosProvider = ({ children }) => {
   const authContext = useContext(AuthContext);
 
-  const baseURL = "http://localhost:8000";
+  const baseURL = "http://10.0.2.2:5000/api/v1";
 
   const authAxios = axios.create({
     baseURL: baseURL,
@@ -40,7 +35,7 @@ const AxiosProvider = ({ children }: any) => {
     }
   );
 
-  const refreshAuthLogic = async (failedRequest: any) => {
+  const refreshAuthLogic = async (failedRequest) => {
     const data = {
       refreshToken: authContext?.authState.refreshToken,
     };

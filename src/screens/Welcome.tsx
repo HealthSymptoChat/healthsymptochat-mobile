@@ -95,14 +95,6 @@ const Welcome = ({ navigation }: any) => {
           >
             Đăng nhập
           </Button>
-          <Button
-            rounded="full"
-            variant="outline"
-            _text={{ color: Colors.primaryMintDark }}
-            onPress={() => navigation.navigate("TabBar")}
-          >
-            Home
-          </Button>
         </View>
       </ScrollView>
     </SafeAreaView>
