@@ -135,7 +135,7 @@ const Navigation = () => {
         </Stack.Navigator>
       ) : (
         <Stack.Navigator
-          initialRouteName="Home"
+          initialRouteName="TabBar"
           screenOptions={{
             headerShadowVisible: false,
             animation: "slide_from_right",
