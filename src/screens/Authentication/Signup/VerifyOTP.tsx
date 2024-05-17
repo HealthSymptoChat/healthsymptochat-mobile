@@ -1,14 +1,42 @@
 import { SafeAreaView, StyleSheet } from "react-native";
-import React, { useState } from "react";
-import { Button, Image, Text, View } from "native-base";
+import React, { useContext, useEffect, useState } from "react";
+import { Button, Image, Text, View, useToast } from "native-base";
 import { Colors } from "../../../theme/Theme";
 import OTPTextInput from "react-native-otp-textinput";
+import CustomToast from "../../../components/CustomToast";
+import { AxiosContext } from "../../../context/AxiosContext";
 
-const VerifyOTP = ({ navigation }: any) => {
+const VerifyOTP = ({ navigation, route }: any) => {
+  const { email }: { email: string } = route.params || "";
+  const toast = useToast();
+  const { authAxios }: any = useContext(AxiosContext);
   const [otp, setOtp] = useState<String | "">("");
-  const handleInputOtp = () => {
-    console.log(otp);
-    navigation.navigate("InputInfo");
+
+  const handleInputOtp = async () => {
+    try {
+      console.log(otp, email);
+      const response = await authAxios.post("/otp/verifyOTP", {
+        email,
+        otp,
+      });
+      console.log(response.data);
+      if (response.data.message === "success") {
+        navigation.navigate("InputInfo", { email });
+      } else {
+        console.log(response.data.message);
+        toast.show({
+          render: () => (
+            <CustomToast
+              message="Đã có lỗi xảy ra, vui lòng thử lại"
+              state="error"
+              onClose={() => toast.closeAll()}
+            />
+          ),
+        });
+      }
+    } catch (error: Error | any) {
+      console.log("Error signing up", error);
+    }
   };
   return (
     <SafeAreaView style={styles.container}>
@@ -34,7 +62,7 @@ const VerifyOTP = ({ navigation }: any) => {
         </Text>
         <OTPTextInput
           handleTextChange={(e) => setOtp(e)}
-          inputCount={4}
+          inputCount={6}
           tintColor={Colors.primaryMintDark}
           offTintColor={Colors.primaryMintDark}
           // containerStyle={{ marginHorizontal: 30 }}

@@ -1,5 +1,5 @@
 import { Dimensions, SafeAreaView, StyleSheet } from "react-native";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   Button,
   Heading,
@@ -10,29 +10,44 @@ import {
   Text,
   View,
   useColorMode,
+  useToast,
 } from "native-base";
 import { Octicons } from "@expo/vector-icons";
 import { Colors } from "../../../theme/Theme";
+import CustomToast from "../../../components/CustomToast";
+import { AxiosContext } from "../../../context/AxiosContext";
 
 const { width, height } = Dimensions.get("screen");
 
 const Signup = ({ navigation }: any) => {
   const { colorMode } = useColorMode();
+  const toast = useToast();
   const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const [confirmPassword, setConfirmPassword] = useState<string>("");
-  const [showPassword, setShowPassword] = useState<boolean>(false);
-  const [showConfirmPassword, setShowConfirmPassword] =
-    useState<boolean>(false);
-  const handleShowPassword = () => {
-    setShowPassword(!showPassword);
-  };
-  const handleShowConfirmPassword = () => {
-    setShowConfirmPassword(!showConfirmPassword);
-  };
-  const handleSignup = () => {
-    console.log(email);
-    navigation.navigate("VerifyOTP");
+  const { authAxios }: any = useContext(AxiosContext);
+
+  const handleSignup = async () => {
+    try {
+      console.log(email);
+      const response = await authAxios.post("/otp/sendOTP", {
+        email,
+      });
+      console.log(response.data);
+      if (response.data.message === "success") {
+        navigation.navigate("VerifyOTP", { email });
+      } else {
+        toast.show({
+          render: () => (
+            <CustomToast
+              message="Đã có lỗi xảy ra, vui lòng thử lại"
+              state="error"
+              onClose={() => toast.closeAll()}
+            />
+          ),
+        });
+      }
+    } catch (error: Error | any) {
+      console.log("Error signing up", error);
+    }
   };
   return (
     <View
