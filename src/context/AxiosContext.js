@@ -24,7 +24,6 @@ const AxiosProvider = ({ children }) => {
   authAxios.interceptors.request.use(
     (config) => {
       if (!config.headers.Authorization) {
-        console.log(authContext?.getAccessToken());
         config.headers.Authorization = `Bearer ${authContext?.getAccessToken()}`;
       }
 
@@ -35,15 +34,32 @@ const AxiosProvider = ({ children }) => {
     }
   );
 
-  const refreshAuthLogic = async (failedRequest) => {
+  authAxios.interceptors.response.use(
+    (response) => response,
+    (error) => {
+      const {
+        config,
+        response: { status },
+      } = error;
+      const originalRequest = config;
+
+      if (status === 403) {
+        return refreshAuthLogic(originalRequest);
+      }
+      return Promise.reject(error);
+    }
+  );
+
+  const refreshAuthLogic = (failedRequest) => {
+    console.log("refreshing token");
     const data = {
-      refreshToken: authContext?.authState.refreshToken,
+      refreshToken: authContext.authState.refreshToken,
     };
 
     const options = {
       method: "POST",
       data,
-      url: baseURL + "/auth/refresh",
+      url: "http://10.0.2.2:5000/api/v1/auth/token",
     };
 
     return axios(options)
@@ -51,7 +67,7 @@ const AxiosProvider = ({ children }) => {
         failedRequest.response.config.headers.Authorization =
           "Bearer " + tokenRefreshResponse.data.accessToken;
 
-        authContext?.setAuthState({
+        authContext.setAuthState({
           ...authContext.authState,
           accessToken: tokenRefreshResponse.data.accessToken,
         });
@@ -70,8 +86,8 @@ const AxiosProvider = ({ children }) => {
         authContext?.setAuthState({
           accessToken: null,
           refreshToken: null,
-          authenticated: false, // Add the 'authenticated' property
-          user: null, // Add the 'user' property
+          // authenticated: false, // Add the 'authenticated' property
+          // user: null, // Add the 'user' property
         });
       });
   };

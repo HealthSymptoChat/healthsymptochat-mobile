@@ -14,10 +14,32 @@ import {
   View,
 } from "native-base";
 import { Colors } from "../../../theme/Theme";
-import { AntDesign, FontAwesome } from "@expo/vector-icons";
+import { AntDesign, FontAwesome, Octicons } from "@expo/vector-icons";
+
+const packages = [
+  {
+    id: "1",
+    title: "Cơ bản",
+    price: "99.000",
+    description: [
+      "Unlock powerfull time-saving tools for creating email delivery and collecting marketing data",
+      "Unlock powerfull time-saving tools for creating email delivery and collecting marketing data1",
+    ],
+  },
+  {
+    id: "2",
+    title: "Chuyên nghiệp",
+    price: "149.000",
+    description: [
+      "Unlock powerfull time-saving tools for creating email delivery and collecting marketing dat2",
+      "Unlock powerfull time-saving tools for creating email delivery and collecting marketing data3",
+    ],
+  },
+];
 
 const Package = ({ navigation }: any) => {
-  const [selectedPackage, setSelectedPackage] = useState<string>("");
+  const [selectedPackage, setSelectedPackage] = useState<string>("1");
+  const [duration, setDuration] = useState<number>(3);
   const handleChoosePackage = (packageId: string) => {
     if (selectedPackage === packageId) {
       setSelectedPackage("");
@@ -40,196 +62,155 @@ const Package = ({ navigation }: any) => {
       }}
       style={{ height: "100%", width: "100%", padding: 20 }}
     >
-      <Pressable
-        style={{ marginVertical: 10 }}
-        onPress={() => handleChoosePackage("1")}
-      >
-        {({ isHovered, isFocused, isPressed }) => {
-          return (
-            <Box
-              _dark={{
-                bg: selectedPackage === "1" ? Colors.primaryMint : "dark.100",
-              }}
-              _light={{
-                bg: selectedPackage === "1" ? Colors.primaryMint : "light.50",
-              }}
-              // bg={
-              //   selectedPackage === "1"
-              //     ? Colors.primaryMint
-              //     : isPressed
-              //     ? "coolGray.200"
-              //     : // : isHovered
-              //       // ? "coolGray.200"
-              //       "coolGray.100"
-              // }
-              style={{
-                transform: [
-                  {
-                    scale: isPressed ? 0.96 : 1,
-                  },
-                ],
-              }}
-              p="5"
-              rounded="30"
-              shadow={3}
-              borderWidth="1"
-              borderColor="coolGray.300"
-            >
-              <HStack alignItems="center">
-                <Badge
-                  bg={Colors.primaryMintDark}
-                  variant="solid"
-                  rounded="full"
-                  style={{ width: "100%" }}
+      <Text fontSize="md" color={"gray.500"}>
+        Mở khóa tất cả các tính năng với gói premium
+      </Text>
+      {packages.map((pkg) => (
+        <Pressable
+          style={{ marginVertical: 10 }}
+          onPress={() => handleChoosePackage(pkg.id)}
+        >
+          {({ isPressed }) => {
+            return (
+              <Box
+                style={{
+                  transform: [
+                    {
+                      scale: isPressed ? 0.96 : 1,
+                    },
+                  ],
+                }}
+                p="5"
+                rounded="30"
+                borderStyle={"dashed"}
+                bg={pkg.id === "2" ? "amber.100" : "coolGray.200"}
+              >
+                <View
+                  display={"flex"}
+                  flexDirection={"row"}
+                  alignItems={"center"}
+                  justifyContent={"space-between"}
                 >
-                  <Heading size="2xl" color={Colors.white}>
-                    Chuyên nghiệp
-                  </Heading>
-                </Badge>
-                {/* <Spacer /> */}
-              </HStack>
-              <Text mt="3" fontSize="md" textAlign="center">
-                99.000 VND / tháng
-              </Text>
-              <View
-                style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <Icon
-                  as={FontAwesome}
-                  name="check"
-                  color={Colors.primaryMintDark}
-                  size="lg"
-                  style={{ marginRight: 5 }}
-                />
-                <Text mt="2" fontSize="sm">
-                  Unlock powerfull time-saving tools for creating email delivery
-                  and collecting marketing data
-                </Text>
-              </View>
-              <View
-                style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <Icon
-                  as={FontAwesome}
-                  name="check"
-                  color={Colors.primaryMintDark}
-                  size="lg"
-                  style={{ marginRight: 5 }}
-                />
-                <Text mt="2" fontSize="sm">
-                  Unlock powerfull time-saving tools for creating email delivery
-                  and collecting marketing data
-                </Text>
-              </View>
-            </Box>
-          );
-        }}
-      </Pressable>
-      <Pressable
-        style={{ marginVertical: 10 }}
-        onPress={() => handleChoosePackage("2")}
+                  <View display={"flex"} flexDirection={"column"}>
+                    <Heading size="md">{pkg.title}</Heading>
+                    <Text mt="3" fontWeight={"semibold"} fontSize="md">
+                      {pkg.price} VNĐ
+                    </Text>
+                  </View>
+                  <View padding={3} bg={Colors.white} rounded={"full"}>
+                    {selectedPackage === pkg.id ? (
+                      <Icon
+                        alignSelf={"center"}
+                        as={FontAwesome}
+                        name={"check-circle"}
+                        size={7}
+                        color={"green.500"}
+                      />
+                    ) : (
+                      <Icon
+                        alignSelf={"center"}
+                        as={FontAwesome}
+                        name={"circle"}
+                        size={7}
+                        color={"gray.500"}
+                      />
+                    )}
+                  </View>
+                </View>
+              </Box>
+            );
+          }}
+        </Pressable>
+      ))}
+      <Heading size="md" style={{ marginVertical: 10 }}>
+        Chọn thời gian
+      </Heading>
+      <View
+        display={"flex"}
+        flexDirection={"row"}
+        justifyContent={"space-between"}
       >
-        {({ isHovered, isFocused, isPressed }) => {
-          return (
-            <Box
-              _dark={{
-                bg: selectedPackage === "2" ? Colors.primaryMint : "dark.100",
-              }}
-              _light={{
-                bg: selectedPackage === "2" ? Colors.primaryMint : "light.50",
-              }}
-              // bg={
-              //   selectedPackage === "2"
-              //     ? Colors.primaryMint
-              //     : isPressed
-              //     ? "coolGray.200"
-              //     : // : isHovered
-              //       // ? "coolGray.200"
-              //       "coolGray.100"
-              // }
-              style={{
-                transform: [
-                  {
-                    scale: isPressed ? 0.96 : 1,
-                  },
-                ],
-              }}
-              p="5"
-              rounded="30"
-              shadow={3}
-              borderWidth="1"
-              borderColor="coolGray.300"
-            >
-              <HStack alignItems="center">
-                <Badge
-                  bg={Colors.primaryMintDark}
-                  variant="solid"
-                  rounded="full"
-                  style={{ width: "100%" }}
+        <Pressable
+          padding={2}
+          bg={Colors.white}
+          borderRadius={"2xl"}
+          borderStyle={"solid"}
+          borderWidth={2}
+          borderColor={duration === 1 ? Colors.primaryMintDark : Colors.grey}
+          onPress={() => setDuration(1)}
+        >
+          <Text>1 tháng</Text>
+        </Pressable>
+        <Pressable
+          padding={2}
+          bg={Colors.white}
+          borderRadius={"2xl"}
+          borderStyle={"solid"}
+          borderWidth={2}
+          borderColor={duration === 3 ? Colors.primaryMintDark : Colors.grey}
+          onPress={() => setDuration(3)}
+        >
+          <Text>3 tháng</Text>
+        </Pressable>
+        <Pressable
+          padding={2}
+          bg={Colors.white}
+          borderRadius={"2xl"}
+          borderStyle={"solid"}
+          borderWidth={2}
+          borderColor={duration === 6 ? Colors.primaryMintDark : Colors.grey}
+          onPress={() => setDuration(6)}
+        >
+          <Text>6 tháng</Text>
+        </Pressable>
+        <Pressable
+          padding={2}
+          bg={Colors.white}
+          borderRadius={"2xl"}
+          borderStyle={"solid"}
+          borderWidth={2}
+          borderColor={duration === 12 ? Colors.primaryMintDark : Colors.grey}
+          onPress={() => setDuration(12)}
+        >
+          <Text>12 tháng</Text>
+        </Pressable>
+      </View>
+      {selectedPackage && (
+        <Heading size="md" style={{ marginTop: 20, marginBottom: 10 }}>
+          Mô tả chi tiết gói
+        </Heading>
+      )}
+      <View>
+        {selectedPackage
+          ? packages
+              .filter((pack) => pack.id === selectedPackage)[0]
+              .description.map((desc) => (
+                <View
+                  key={desc}
+                  display={"flex"}
+                  flexDirection={"row"}
+                  alignItems={"center"}
+                  justifyContent={"center"}
                 >
-                  <Heading size="2xl" color={Colors.white}>
-                    Chuyên nghiệp
-                  </Heading>
-                </Badge>
-                {/* <Spacer /> */}
-              </HStack>
-              <Text mt="3" fontSize="md" textAlign="center">
-                99.000 VND / tháng
-              </Text>
-              <View
-                style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <Icon
-                  as={FontAwesome}
-                  name="check"
-                  color={Colors.primaryMintDark}
-                  size="lg"
-                  style={{ marginRight: 5 }}
-                />
-                <Text mt="2" fontSize="sm">
-                  Unlock powerfull time-saving tools for creating email delivery
-                  and collecting marketing data
-                </Text>
-              </View>
-              <View
-                style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <Icon
-                  as={FontAwesome}
-                  name="check"
-                  color={Colors.primaryMintDark}
-                  size="lg"
-                  style={{ marginRight: 5 }}
-                />
-                <Text mt="2" fontSize="sm">
-                  Unlock powerfull time-saving tools for creating email delivery
-                  and collecting marketing data
-                </Text>
-              </View>
-            </Box>
-          );
-        }}
-      </Pressable>
+                  <Icon
+                    as={Octicons}
+                    name={"dot-fill"}
+                    size={5}
+                    color={Colors.primaryMintDark}
+                  />
+                  <Text margin={2}>{desc}</Text>
+                </View>
+              ))
+          : null}
+      </View>
+
+      {selectedPackage && (
+        <Heading size="md" style={{ marginTop: 20, marginBottom: 10 }}>
+          Tổng cộng:{" "}
+          {packages.filter((pack) => pack.id === selectedPackage)[0].price || 0}{" "}
+          VNĐ
+        </Heading>
+      )}
       <Button
         mt="10"
         isDisabled={!selectedPackage}

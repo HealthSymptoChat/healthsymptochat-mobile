@@ -17,7 +17,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/Logo_no_text.png",
         "backgroundColor": "#ffffff"
       },
       "package": "com.minhdat2003.healthsymptochatmobile"

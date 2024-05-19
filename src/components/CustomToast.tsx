@@ -37,6 +37,7 @@ const CustomToast = (props: CustomToastProps) => {
           ? "warning"
           : "info"
       }
+      borderRadius={20}
       variant={"solid"}
     >
       <VStack space={1} flexShrink={1} w="100%">

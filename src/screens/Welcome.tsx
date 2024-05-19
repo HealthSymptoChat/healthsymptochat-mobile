@@ -76,7 +76,13 @@ const Welcome = ({ navigation }: any) => {
           }}
         />
         <CarouselCard data={data} />
-        <View style={styles.buttonGroup}>
+        <View
+          height={100}
+          display={"flex"}
+          flexDirection={"column"}
+          justifyContent={"space-between"}
+          margin={5}
+        >
           <Button
             rounded="full"
             variant="solid"
@@ -91,6 +97,7 @@ const Welcome = ({ navigation }: any) => {
             rounded="full"
             variant="outline"
             _text={{ color: Colors.primaryMintDark }}
+            borderColor={Colors.primaryMintDark}
             onPress={() => navigation.navigate("Login")}
           >
             Đăng nhập
@@ -108,10 +115,10 @@ const styles = StyleSheet.create({
     marginVertical: 20,
     height: "100%",
   },
-  buttonGroup: {
-    height: 100,
-    marginVertical: 40,
-    marginHorizontal: 20,
-    justifyContent: "space-between", // Add spacing between buttons
-  },
+  // buttonGroup: {
+  //   height: 100,
+  //   marginVertical: 40,
+  //   marginHorizontal: 20,
+  //   justifyContent: "space-between", // Add spacing between buttons
+  // },
 });
