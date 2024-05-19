@@ -11,7 +11,7 @@ import {
   StatusBar,
   useToast,
 } from "native-base";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { AntDesign, MaterialIcons, FontAwesome } from "@expo/vector-icons";
 import { Colors } from "../../../theme/Theme";
 import { Dimensions } from "react-native";
@@ -21,6 +21,8 @@ import { AxiosContext } from "../../../context/AxiosContext";
 import { AuthContext } from "../../../context/AuthContext";
 import * as SecureStore from "expo-secure-store";
 import CustomToast from "../../../components/CustomToast";
+import { useIsFocused } from "@react-navigation/native";
+import { GoogleSignin } from "@react-native-google-signin/google-signin";
 
 registerTranslation("vi", {
   save: "Lưu",
@@ -44,13 +46,15 @@ registerTranslation("vi", {
 const { width, height } = Dimensions.get("window");
 
 const UserInfo = () => {
+  const focus = useIsFocused();
   const { colorMode, toggleColorMode } = useColorMode();
   const { authAxios }: any = useContext(AxiosContext);
   const authContext: any = useContext(AuthContext);
   const toast = useToast();
   const [openEdit, setOpenEdit] = useState<boolean>(false);
-  const [name, setName] = useState<string>("John Doe");
-  const [gender, setGender] = useState<string>("male");
+  const [username, setUsername] = useState<string>("");
+  const [name, setName] = useState<string>("");
+  const [gender, setGender] = useState<string>("");
   const [dob, setDob] = useState<CalendarDate | undefined>(undefined);
   const [showDatePicker, setShowDatePicker] = useState<boolean>(false);
 
@@ -64,6 +68,20 @@ const UserInfo = () => {
     },
     [setDob]
   );
+
+  useEffect(() => {
+    if (focus) {
+      fetchUserInfo();
+    }
+  }, [focus]);
+
+  const fetchUserInfo = () => {
+    const user = authContext.authState?.user;
+    setUsername(user?.username);
+    setName(user?.firstName + " " + user?.lastName);
+    setGender(user?.gender);
+    setDob(user?.dob ? new Date(user?.dob) : undefined);
+  };
 
   const handleEditUserInfo = () => {
     setOpenEdit(false);
@@ -80,6 +98,7 @@ const UserInfo = () => {
       await SecureStore.deleteItemAsync("accessToken");
       await SecureStore.deleteItemAsync("refreshToken");
       await SecureStore.deleteItemAsync("user");
+      await GoogleSignin.signOut();
       toast.show({
         render: () => (
           <CustomToast
@@ -127,7 +146,7 @@ const UserInfo = () => {
         alignItems={"center"}
       >
         <Heading marginBottom={10} fontSize="lg" color={Colors.black}>
-          johnDoe123
+          {username}
         </Heading>
         <View
           padding={5}

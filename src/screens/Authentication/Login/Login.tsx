@@ -67,8 +67,8 @@ const Login = ({ navigation }: any) => {
         username: username,
         password: password,
       });
-      if (response.data) {
-        const { tokens, user } = response.data;
+      if (response.data.message === "success") {
+        const { tokens, user } = response.data.data;
         SecureStore.setItemAsync("accessToken", tokens.accessToken);
         SecureStore.setItemAsync("refreshToken", tokens.refreshToken);
         SecureStore.setItemAsync("user", JSON.stringify(user));
@@ -122,18 +122,12 @@ const Login = ({ navigation }: any) => {
     try {
       await GoogleSignin.hasPlayServices();
       const userInfo = await GoogleSignin.signIn();
-      const user = {
-        email: userInfo.user.email,
-        name: userInfo.user.name,
-        photo: userInfo.user.photo,
-      };
-      console.log(user);
 
-      const response = publicAxios.post("/auth/google", user);
+      const response = await publicAxios.post("/auth/google", userInfo.user);
       try {
-        if (response.message === "success") {
-          console.log("success");
-          const { accessToken, refreshToken, user } = response.data;
+        if (response.data.message === "success") {
+          const { user } = response.data.data;
+          const { accessToken, refreshToken } = response.data.data.tokens;
           await SecureStore.setItemAsync("accessToken", accessToken);
           await SecureStore.setItemAsync("refreshToken", refreshToken);
           await SecureStore.setItemAsync("user", JSON.stringify(user));
@@ -155,6 +149,7 @@ const Login = ({ navigation }: any) => {
             ),
           });
         } else {
+          console.log(response.data.message);
           toast.show({
             render: () => (
               <CustomToast
