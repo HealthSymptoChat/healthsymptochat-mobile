@@ -1,9 +1,11 @@
 import { SafeAreaView, StyleSheet } from "react-native";
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
+  Actionsheet,
   Badge,
   Box,
   Button,
+  Divider,
   Flex,
   HStack,
   Heading,
@@ -12,15 +14,30 @@ import {
   Spacer,
   Text,
   View,
+  useDisclose,
+  useToast,
 } from "native-base";
+import * as Linking from "expo-linking";
+import * as WebBrowser from "expo-web-browser";
 import { Colors } from "../../../theme/Theme";
 import { AntDesign, FontAwesome, Octicons } from "@expo/vector-icons";
+import { formatNumber } from "../../../utils/NumberFormatter";
+import { AxiosContext } from "../../../context/AxiosContext";
+import { useIsFocused } from "@react-navigation/native";
+import CustomToast from "../../../components/CustomToast";
 
-const packages = [
+interface Package {
+  id: string;
+  title: string;
+  price: number;
+  description: string[];
+}
+
+const packages: Package[] = [
   {
     id: "1",
     title: "Cơ bản",
-    price: "99.000",
+    price: 99000,
     description: [
       "Unlock powerfull time-saving tools for creating email delivery and collecting marketing data",
       "Unlock powerfull time-saving tools for creating email delivery and collecting marketing data1",
@@ -29,7 +46,7 @@ const packages = [
   {
     id: "2",
     title: "Chuyên nghiệp",
-    price: "149.000",
+    price: 149000,
     description: [
       "Unlock powerfull time-saving tools for creating email delivery and collecting marketing dat2",
       "Unlock powerfull time-saving tools for creating email delivery and collecting marketing data3",
@@ -38,19 +55,74 @@ const packages = [
 ];
 
 const Package = ({ navigation }: any) => {
-  const [selectedPackage, setSelectedPackage] = useState<string>("1");
+  const { authAxios }: any = useContext(AxiosContext);
+  const focus = useIsFocused();
+  const toast = useToast();
+  const [selectedPackage, setSelectedPackage] = useState<Package>();
   const [duration, setDuration] = useState<number>(3);
-  const handleChoosePackage = (packageId: string) => {
-    if (selectedPackage === packageId) {
-      setSelectedPackage("");
-    } else {
-      setSelectedPackage(packageId);
+  const { isOpen, onOpen, onClose } = useDisclose();
+  const [renderTime, setRenderTime] = useState(0);
+  const redirectUri = Linking.createURL("/");
+
+  const handleChoosePackage = (packageId: Package) => {
+    setSelectedPackage(packageId);
+    // if (selectedPackage === packageId) {
+    //   setSelectedPackage(undefined);
+    // } else {
+    //   setSelectedPackage(packageId);
+    // }
+  };
+
+  const handlePurchasePackage = async () => {
+    try {
+      console.log("Redirect uri", redirectUri);
+      const url = await authAxios.post("/payment/PayOS", {
+        redirectUri: redirectUri,
+      });
+
+      if (url.data.message === "success") {
+        WebBrowser.openBrowserAsync(url.data.data.checkoutUrl);
+        // const result = await WebBrowser.openBrowserAsync(
+        //   url.data.data.checkoutUrl
+        // );
+        // if (result.type === "cancel") {
+        //   console.log("User cancelled the payment");
+        // }
+        onClose();
+      }
+    } catch (error: any) {
+      console.log("Error purchase package", error);
     }
   };
-  const handleSubmitPackage = () => {
-    console.log(selectedPackage);
-    navigation.navigate("Payment");
-  };
+  useEffect(() => {
+    const handleOpenURL = (event: any) => {
+      console.log("App was opened with URL: " + event.url);
+      // Perform some action here
+      const { path, queryParams } = Linking.parse(event.url);
+      console.log("Path", path);
+      console.log("Query params", queryParams);
+      if (queryParams?.status === "CANCELLED") {
+        onClose();
+        toast.show({
+          render: () => (
+            <CustomToast
+              message={"Thanh toán đã bị hủy"}
+              state={"error"}
+              onClose={() => {
+                toast.closeAll();
+              }}
+            />
+          ),
+        });
+      }
+    };
+
+    const eventEmitter = Linking.addEventListener("url", handleOpenURL);
+
+    return () => {
+      eventEmitter.remove();
+    };
+  }, []);
   return (
     // <SafeAreaView style={styles.container}>
     <View
@@ -68,7 +140,7 @@ const Package = ({ navigation }: any) => {
       {packages.map((pkg) => (
         <Pressable
           style={{ marginVertical: 10 }}
-          onPress={() => handleChoosePackage(pkg.id)}
+          onPress={() => handleChoosePackage(pkg)}
         >
           {({ isPressed }) => {
             return (
@@ -94,11 +166,11 @@ const Package = ({ navigation }: any) => {
                   <View display={"flex"} flexDirection={"column"}>
                     <Heading size="md">{pkg.title}</Heading>
                     <Text mt="3" fontWeight={"semibold"} fontSize="md">
-                      {pkg.price} VNĐ
+                      {formatNumber(pkg.price)} VNĐ
                     </Text>
                   </View>
                   <View padding={3} bg={Colors.white} rounded={"full"}>
-                    {selectedPackage === pkg.id ? (
+                    {selectedPackage === pkg ? (
                       <Icon
                         alignSelf={"center"}
                         as={FontAwesome}
@@ -183,7 +255,7 @@ const Package = ({ navigation }: any) => {
       <View>
         {selectedPackage
           ? packages
-              .filter((pack) => pack.id === selectedPackage)[0]
+              .filter((pack: Package) => pack.id === selectedPackage.id)[0]
               .description.map((desc) => (
                 <View
                   key={desc}
@@ -207,7 +279,11 @@ const Package = ({ navigation }: any) => {
       {selectedPackage && (
         <Heading size="md" style={{ marginTop: 20, marginBottom: 10 }}>
           Tổng cộng:{" "}
-          {packages.filter((pack) => pack.id === selectedPackage)[0].price || 0}{" "}
+          {formatNumber(
+            packages.filter(
+              (pack: Package) => pack.id === selectedPackage.id
+            )[0].price
+          ) || 0}{" "}
           VNĐ
         </Heading>
       )}
@@ -215,11 +291,117 @@ const Package = ({ navigation }: any) => {
         mt="10"
         isDisabled={!selectedPackage}
         bg={Colors.primaryMintDark}
-        onPress={handleSubmitPackage}
+        onPress={() => onOpen()}
         rounded="full"
       >
         Đến thanh toán
       </Button>
+      <Actionsheet isOpen={isOpen} onClose={onClose}>
+        <Actionsheet.Content>
+          <View
+            width={"100%"}
+            paddingX={5}
+            // display={"flex"}
+            // flexDirection={"row"}
+            // justifyContent={"space-between"}
+            // alignItems={"center"}
+            // padding={5}
+          >
+            <Heading textAlign={"center"} fontSize={"lg"}>
+              Đơn hàng của bạn
+            </Heading>
+            <View
+              display={"flex"}
+              flexDirection={"row"}
+              justifyContent={"space-between"}
+            >
+              <Text
+                textAlign={"center"}
+                fontSize={"md"}
+                mt={2}
+                color={"gray.600"}
+              >
+                Tên gói:
+              </Text>
+              <Text
+                textAlign={"center"}
+                fontSize={"lg"}
+                mt={2}
+                fontWeight={"bold"}
+                color={Colors.black}
+              >
+                {selectedPackage?.title}
+              </Text>
+            </View>
+            <View
+              display={"flex"}
+              flexDirection={"row"}
+              justifyContent={"space-between"}
+            >
+              <Text
+                textAlign={"center"}
+                fontSize={"md"}
+                mt={2}
+                color={"gray.600"}
+              >
+                Giá:
+              </Text>
+              <Text
+                textAlign={"center"}
+                fontSize={"lg"}
+                mt={2}
+                fontWeight={"bold"}
+                color={Colors.black}
+              >
+                {formatNumber(selectedPackage?.price || 0)} VNĐ
+              </Text>
+            </View>
+            <View
+              display={"flex"}
+              flexDirection={"row"}
+              justifyContent={"space-between"}
+            >
+              <Text
+                textAlign={"center"}
+                fontSize={"md"}
+                mt={2}
+                color={"gray.600"}
+              >
+                Thời gian sử dụng:
+              </Text>
+              <Text
+                textAlign={"center"}
+                fontSize={"lg"}
+                mt={2}
+                fontWeight={"bold"}
+                color={Colors.black}
+              >
+                {duration} tháng
+              </Text>
+            </View>
+            <Divider my={2} />
+            <Text textAlign={"center"} mt={2} fontSize={"md"}>
+              Tổng cộng
+            </Text>
+            <Text
+              textAlign={"center"}
+              mt={2}
+              fontSize={"lg"}
+              fontWeight={"bold"}
+            >
+              {formatNumber(selectedPackage?.price || 0 * duration)} VNĐ
+            </Text>
+            <Button
+              m={5}
+              bg={Colors.primaryMintDark}
+              rounded="full"
+              onPress={handlePurchasePackage}
+            >
+              Thanh toán
+            </Button>
+          </View>
+        </Actionsheet.Content>
+      </Actionsheet>
     </View>
     // {/* </SafeAreaView> */}
   );

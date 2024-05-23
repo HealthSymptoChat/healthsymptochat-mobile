@@ -2,7 +2,7 @@ import { SafeAreaView, StyleSheet } from "react-native";
 import React from "react";
 import { View, Text, Heading } from "native-base";
 
-const Payment = () => {
+const Payment = ({ navigation, route }: any) => {
   return (
     // <SafeAreaView>
     <View

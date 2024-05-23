@@ -168,7 +168,7 @@ const Navigation = () => {
             name="Payment"
             component={Payment}
             options={{
-              title: "Phương thức thanh toán",
+              title: "Thanh toán",
               headerStyle: {
                 backgroundColor:
                   colorMode === "dark" ? Colors.black : Colors.white,

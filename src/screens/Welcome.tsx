@@ -18,25 +18,25 @@ const data = [
   {
     title: "Chào mừng bạn đến với HealthSymptoChat",
     description: "Ứng dụng hỗ trợ dự đoán bệnh thông qua triệu chứng",
-    image: "https://via.placeholder.com/320x196.png",
+    image: require("../../assets/welcome1.png"),
   },
   {
     title: "Giảm thời gian tìm kiếm thông tin",
     description:
       "Chúng tôi sử dung trí tuệ nhân tạo để cung cấp thông tin chọn lọc và cô đọng nhất",
-    image: "https://via.placeholder.com/320x196.png",
+    image: require("../../assets/welcome2.png"),
   },
   {
     title: "Thông tin cung cấp uy tín, chất lượng",
     description:
       "Nguồn dữ liệu bệnh lớn được kiểm định từ chuyên gia giúp cung cấp những dự đoán với mức độ chính xác cao",
-    image: "https://via.placeholder.com/320x196.png",
+    image: require("../../assets/welcome3.png"),
   },
   {
     title: "Giao diện thân thiện với người dùng",
     description:
       "Giao diện được thiết kế tối ưu nhằm nâng cao trải nghiệm của khách hàng",
-    image: "https://via.placeholder.com/320x196.png",
+    image: require("../../assets/welcome4.png"),
   },
 ];
 

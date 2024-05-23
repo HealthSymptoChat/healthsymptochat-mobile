@@ -48,19 +48,11 @@ const Pagination = ({
 };
 
 const SlideItem = ({ item }: any) => {
-  //   const translateYImage = new Animated.Value(40);
-
-  //   Animated.timing(translateYImage, {
-  //     toValue: 0,
-  //     duration: 1000,
-  //     useNativeDriver: true,
-  //     easing: Easing.bounce,
-  //   }).start();
   return (
     <View style={styles.group}>
       <Animated.Image
         style={styles.image}
-        source={{ uri: item.image }}
+        source={item.image}
         resizeMode="contain"
       />
       <Text
@@ -163,7 +155,7 @@ const styles = StyleSheet.create({
   image: {
     marginBottom: 20,
     width: 320,
-    height: 196,
+    height: 320,
     borderRadius: 20,
   },
   title: {

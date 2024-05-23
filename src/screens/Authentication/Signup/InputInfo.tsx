@@ -22,6 +22,7 @@ import { AuthContext } from "../../../context/AuthContext";
 import CustomToast from "../../../components/CustomToast";
 import * as SecureStore from "expo-secure-store";
 import { AxiosContext } from "../../../context/AxiosContext";
+import { FontAwesome } from "@expo/vector-icons";
 
 registerTranslation("vi", {
   save: "Lưu",
@@ -43,14 +44,17 @@ registerTranslation("vi", {
   minute: "Phút",
 });
 
-const InputInfo = () => {
-  const { authAxios }: any = useContext(AxiosContext);
+const InputInfo = ({ route }: any) => {
+  const { publicAxios }: any = useContext(AxiosContext);
   const authContext: any = useContext(AuthContext);
+  const { email } = route.params;
   const toast = useToast();
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [showConfirmPassword, setShowConfirmPassword] =
     useState<boolean>(false);
   const [showDatePicker, setShowDatePicker] = useState<boolean>(false);
+  const [firstName, setFirstName] = useState<string>("");
+  const [lastName, setLastName] = useState<string>("");
   const [username, setUsername] = useState<string>("");
   const [gender, setGender] = useState<string>("");
   const [dob, setDob] = useState<CalendarDate | undefined>(undefined);
@@ -77,84 +81,95 @@ const InputInfo = () => {
   );
 
   const handleRegisterUser = async () => {
-    console.log(username, gender, dob, phone, password, confirmPassword);
-    // try {
-    //   if (
-    //     !(
-    //       username &&
-    //       gender &&
-    //       dob &&
-    //       password &&
-    //       confirmPassword &&
-    //       password &&
-    //       confirmPassword
-    //     )
-    //   ) {
-    //     if (password !== confirmPassword) {
-    //       toast.show({
-    //         render: () => (
-    //           <CustomToast
-    //             message="Mật khẩu không trùng khớp"
-    //             state="error"
-    //             onClose={() => toast.closeAll()}
-    //           />
-    //         ),
-    //       });
-    //       return;
-    //     }
-    //     toast.show({
-    //       render: () => (
-    //         <CustomToast
-    //           message="Vui lòng điền đầy đủ thông tin"
-    //           state="error"
-    //           onClose={() => toast.closeAll()}
-    //         />
-    //       ),
-    //     });
-    //     return;
-    //   }
-    //   console.log(username, gender, dob, phone, password, confirmPassword);
-    //   const response = await authAxios.post("/auth/signUp", {
-    //     username: username,
-    //     gender: gender,
-    //     dob: dob,
-    //     password: password,
-    //   });
-    //   console.log(response.data);
-    //   if (response.data) {
-    //     const { tokens, user } = response.data;
-    //     SecureStore.setItemAsync("accessToken", tokens.accessToken);
-    //     SecureStore.setItemAsync("refreshToken", tokens.refreshToken);
-    //     SecureStore.setItemAsync("user", JSON.stringify(user));
-    //     authContext.setAuthState({
-    //       accessToken: tokens.accessToken,
-    //       refreshToken: tokens.refreshToken,
-    //       authenticated: true,
-    //       user,
-    //     });
-    //     toast.show({
-    //       render: () => (
-    //         <CustomToast
-    //           message="Đăng ký thành công"
-    //           state="success"
-    //           onClose={() => toast.closeAll()}
-    //         />
-    //       ),
-    //     });
-    //   } else {
-    //     toast.show({
-    //       render: () => (
-    //         <CustomToast
-    //           message="Đã có lỗi xảy ra, vui lòng thử lại"
-    //           state="error"
-    //           onClose={() => toast.closeAll()}
-    //         />
-    //       ),
-    //     });
-    //   }
-    // } catch (error: Error | any) {
-    //   console.log("Error signing up", error);
-    // }
+    try {
+      if (
+        !(
+          username &&
+          gender &&
+          dob &&
+          password &&
+          confirmPassword &&
+          password &&
+          confirmPassword
+        )
+      ) {
+        toast.show({
+          render: () => (
+            <CustomToast
+              message="Vui lòng điền đầy đủ thông tin"
+              state="error"
+              onClose={() => toast.closeAll()}
+            />
+          ),
+        });
+        return;
+      }
+      if (password !== confirmPassword) {
+        toast.show({
+          render: () => (
+            <CustomToast
+              message="Mật khẩu không trùng khớp"
+              state="error"
+              onClose={() => toast.closeAll()}
+            />
+          ),
+        });
+        return;
+      }
+      console.log(
+        email,
+        firstName,
+        lastName,
+        username,
+        gender,
+        dob,
+        phone,
+        password,
+        confirmPassword
+      );
+      const response = await publicAxios.post("/auth/signup", {
+        email: email,
+        firstName: firstName,
+        lastName: lastName,
+        username: username,
+        gender: gender,
+        // dob: dob,
+        password: password,
+      });
+      if (response.data.message === "success") {
+        const { tokens, user } = response.data.data;
+        SecureStore.setItemAsync("accessToken", tokens.accessToken);
+        SecureStore.setItemAsync("refreshToken", tokens.refreshToken);
+        SecureStore.setItemAsync("user", JSON.stringify(user));
+        authContext.setAuthState({
+          accessToken: tokens.accessToken,
+          refreshToken: tokens.refreshToken,
+          authenticated: true,
+          user,
+        });
+        toast.show({
+          render: () => (
+            <CustomToast
+              message="Đăng ký thành công"
+              state="success"
+              onClose={() => toast.closeAll()}
+            />
+          ),
+        });
+      } else {
+        toast.show({
+          render: () => (
+            <CustomToast
+              message="Đã có lỗi xảy ra, vui lòng thử lại"
+              state="error"
+              onClose={() => toast.closeAll()}
+            />
+          ),
+        });
+      }
+    } catch (error: Error | any) {
+      console.log("Error signing up", error);
+    }
   };
   return (
     <SafeAreaView style={styles.container}>
@@ -175,6 +190,36 @@ const InputInfo = () => {
         >
           Nhập một số thông tin của bạn
         </Heading>
+        <View
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-between",
+          }}
+        >
+          <View width={"49%"}>
+            <Text fontSize="md" style={{ margin: 10 }}>
+              Họ
+            </Text>
+            <Input
+              variant="rounded"
+              placeholder="Nhập họ của bạn"
+              isRequired={true}
+              onChange={(e) => setLastName(e.nativeEvent.text)}
+            />
+          </View>
+          <View width={"49%"}>
+            <Text fontSize="md" style={{ margin: 10 }}>
+              Tên
+            </Text>
+            <Input
+              variant="rounded"
+              placeholder="Nhập tên của bạn"
+              isRequired={true}
+              onChange={(e) => setFirstName(e.nativeEvent.text)}
+            />
+          </View>
+        </View>
         <Text fontSize="md" style={{ margin: 10 }}>
           Tên đăng nhập
         </Text>
@@ -219,17 +264,33 @@ const InputInfo = () => {
             </Radio>
           </View>
         </Radio.Group>
-        <Button
-          rounded="full"
+        <Text fontSize="md" style={{ margin: 10 }}>
+          Ngày sinh
+        </Text>
+        <Input
           variant="outline"
-          marginY={2}
-          _text={{ color: Colors.black }}
-          //   bg={Colors.primaryMintDark}
-          style={{ marginHorizontal: 10 }}
-          onPress={() => setShowDatePicker(true)}
-        >
-          {dob ? dob.toDateString() : "Chọn ngày sinh"}
-        </Button>
+          rounded={"full"}
+          value={dob ? dob.toDateString() : "Chọn ngày sinh"}
+          size={"lg"}
+          readOnly={true}
+          // isDisabled={!openEdit}
+          _focus={{
+            borderColor: Colors.primaryMintDark,
+          }}
+          InputLeftElement={
+            <Icon
+              as={FontAwesome}
+              name="calendar"
+              size={5}
+              color={Colors.primaryMintDark}
+              onPress={() => {
+                setShowDatePicker(true);
+              }}
+              marginLeft={2}
+              marginRight={5}
+            />
+          }
+        />
         <DatePickerModal
           locale="vi"
           mode="single"
@@ -281,7 +342,13 @@ const InputInfo = () => {
           rounded="full"
           variant="solid"
           isDisabled={
-            !username || !gender || !dob || !password || !confirmPassword
+            !firstName ||
+            !lastName ||
+            !username ||
+            !gender ||
+            !dob ||
+            !password ||
+            !confirmPassword
           }
           bg={Colors.primaryMintDark}
           onPress={handleRegisterUser}
