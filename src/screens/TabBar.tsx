@@ -38,7 +38,7 @@ const TabBar = () => {
           options={{
             tabBarLabel: "Trang chủ",
             tabBarIcon: ({ color }) => (
-              <Icon as={AntDesign} name="home" color={color} size={5} />
+              <Icon as={AntDesign} name="home" color={color} size={6} />
             ),
           }}
         />
@@ -48,7 +48,7 @@ const TabBar = () => {
           options={{
             tabBarLabel: "Hồ sơ",
             tabBarIcon: ({ color }) => (
-              <Icon as={AntDesign} name="user" color={color} size={5} />
+              <Icon as={AntDesign} name="user" color={color} size={6} />
             ),
           }}
         />
@@ -62,7 +62,7 @@ const TabBar = () => {
                 as={FontAwesome}
                 name="newspaper-o"
                 color={color}
-                size={5}
+                size={6}
               />
             ),
           }}

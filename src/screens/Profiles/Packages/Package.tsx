@@ -200,7 +200,7 @@ const Package = ({ navigation }: any) => {
       <View
         display={"flex"}
         flexDirection={"row"}
-        justifyContent={"space-between"}
+        justifyContent={"space-around"}
       >
         <Pressable
           padding={2}
@@ -234,17 +234,6 @@ const Package = ({ navigation }: any) => {
           onPress={() => setDuration(6)}
         >
           <Text>6 tháng</Text>
-        </Pressable>
-        <Pressable
-          padding={2}
-          bg={Colors.white}
-          borderRadius={"2xl"}
-          borderStyle={"solid"}
-          borderWidth={2}
-          borderColor={duration === 12 ? Colors.primaryMintDark : Colors.grey}
-          onPress={() => setDuration(12)}
-        >
-          <Text>12 tháng</Text>
         </Pressable>
       </View>
       {selectedPackage && (

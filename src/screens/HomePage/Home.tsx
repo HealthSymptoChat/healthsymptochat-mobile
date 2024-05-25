@@ -176,8 +176,106 @@ const Home = ({ navigation }: any) => {
       // bg={"cyan.50"}
     >
       <ScrollView showsVerticalScrollIndicator={false}>
+        <View
+          bg={Colors.primaryMint}
+          width={"170%"}
+          height={260}
+          borderBottomRadius={"full"}
+          // position={"absolute"}
+          // top={0}
+          left={"-35%"}
+        >
+          <View
+            width={"40%"}
+            height={160}
+            position={"relative"}
+            top={10}
+            left={"23%"}
+          >
+            <View width={"70%"} p={2} bg={Colors.white} borderRadius={"3xl"}>
+              <Heading fontSize={"lg"}>Chào {username}!</Heading>
+              <Text fontStyle={"normal"} color={"gray.500"}>
+                Hôm nay bạn cảm thấy thế nào?
+              </Text>
+            </View>
+          </View>
+          <View
+            position={"relative"}
+            bottom={"24"}
+            left={"48%"}
+            width={10}
+            height={10}
+            zIndex={-2}
+            borderStyle={"solid"}
+            borderLeftWidth={30}
+            borderBottomWidth={30}
+            borderLeftColor={"transparent"}
+            borderRightColor={"transparent"}
+            borderBottomColor={Colors.white}
+            style={{ transform: [{ rotate: "180deg" }] }}
+          />
+          <Image
+            alignSelf={"center"}
+            source={require("../../../assets/welcome1.png")}
+            alt="Healthy"
+            position={"relative"}
+            top={-170}
+            right={-130}
+            size={200}
+            // zIndex={1}
+            resizeMode="contain"
+          />
+          <View
+            width={"40%"}
+            height={160}
+            position={"relative"}
+            top={"-100%"}
+            left={"23%"}
+          >
+            <View width={"70%"} p={2} bg={Colors.white} borderRadius={"3xl"}>
+              <Text fontSize={"lg"} fontWeight={"semibold"}>
+                Đánh giá tình hình sức khỏe của bạn
+              </Text>
+            </View>
+          </View>
+          <View
+            position={"relative"}
+            bottom={"153%"}
+            left={"48%"}
+            width={10}
+            height={10}
+            zIndex={-2}
+            borderStyle={"solid"}
+            borderLeftWidth={30}
+            borderBottomWidth={30}
+            borderLeftColor={"transparent"}
+            borderRightColor={"transparent"}
+            borderBottomColor={Colors.white}
+            style={{ transform: [{ rotate: "180deg" }] }}
+          />
+        </View>
+        <Button
+          width={"80%"}
+          alignSelf={"center"}
+          marginTop={5}
+          rounded={"full"}
+          variant={"outline"}
+          borderColor={Colors.primaryMintDark}
+          _text={{ fontWeight: "bold", fontSize: "lg" }}
+          onPress={() => navigation.navigate("Chat")}
+          leftIcon={
+            <Image
+              source={require("../../../assets/Logo_no_text.png")}
+              alt="Chat"
+              size={7}
+              resizeMode="contain"
+            />
+          }
+        >
+          Chẩn đoán ngay
+        </Button>
         <View padding={5}>
-          <View>
+          {/* <View>
             <Heading fontSize={"lg"}>Chào {username}!</Heading>
             <Text fontStyle={"normal"} color={"gray.500"}>
               {" "}
@@ -209,14 +307,16 @@ const Home = ({ navigation }: any) => {
             <View w={"2/3"}>
               <Image
                 alignSelf={"center"}
-                source={{
-                  uri: "https://img.lovepik.com/free_png/28/84/14/15C58PICmdQ758PICAc4jCZ4g_PIC2018.png_860.png",
-                }}
+                source={require("../../../assets/welcome1.png")}
                 alt="Healthy"
-                size={150}
+                position={"absolute"}
+                bottom={"-60"}
+                right={-10}
+                size={250}
+                resizeMode="contain"
               />
             </View>
-          </View>
+          </View> */}
           <FlatList
             scrollEnabled={false}
             ref={flatListRef}

@@ -23,6 +23,7 @@ import {
   DarkTheme,
   DefaultTheme,
 } from "@react-navigation/native";
+import Chat from "./Chat/Chat";
 
 const Stack = createNativeStackNavigator();
 
@@ -150,6 +151,15 @@ const Navigation = () => {
             name="Home"
             component={Home}
             options={{ title: "", headerTransparent: true, animation: "none" }}
+          />
+          <Stack.Screen
+            name="Chat"
+            component={Chat}
+            options={{
+              title: "",
+              headerTransparent: true,
+              animation: "default",
+            }}
           />
           <Stack.Screen
             name="Package"

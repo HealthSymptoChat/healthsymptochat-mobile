@@ -41,7 +41,7 @@ const Profiles = ({ navigation }: any) => {
           <Icon
             as={AntDesign}
             name={"idcard"}
-            size={5}
+            size={7}
             color={Colors.primaryMintDark}
             marginRight={2}
           />
@@ -50,7 +50,7 @@ const Profiles = ({ navigation }: any) => {
         <Icon
           as={AntDesign}
           name={"right"}
-          size={5}
+          size={6}
           color={Colors.primaryMintDark}
         />
       </TouchableOpacity>
@@ -76,7 +76,7 @@ const Profiles = ({ navigation }: any) => {
           <Icon
             as={AntDesign}
             name={"medicinebox"}
-            size={5}
+            size={7}
             color={Colors.primaryMintDark}
             marginRight={2}
           />
@@ -85,7 +85,7 @@ const Profiles = ({ navigation }: any) => {
         <Icon
           as={AntDesign}
           name={"right"}
-          size={5}
+          size={6}
           color={Colors.primaryMintDark}
         />
       </TouchableOpacity>
@@ -111,7 +111,7 @@ const Profiles = ({ navigation }: any) => {
           <Icon
             as={MaterialIcons}
             name={"medication"}
-            size={5}
+            size={7}
             color={Colors.primaryMintDark}
             marginRight={2}
           />
@@ -120,7 +120,7 @@ const Profiles = ({ navigation }: any) => {
         <Icon
           as={AntDesign}
           name={"right"}
-          size={5}
+          size={6}
           color={Colors.primaryMintDark}
         />
       </TouchableOpacity>
@@ -149,7 +149,7 @@ const Profiles = ({ navigation }: any) => {
           <Icon
             as={MaterialIcons}
             name={"history"}
-            size={5}
+            size={7}
             color={Colors.primaryMintDark}
             marginRight={2}
           />
@@ -158,7 +158,7 @@ const Profiles = ({ navigation }: any) => {
         <Icon
           as={AntDesign}
           name={"right"}
-          size={5}
+          size={6}
           color={Colors.primaryMintDark}
         />
       </TouchableOpacity>
@@ -187,7 +187,7 @@ const Profiles = ({ navigation }: any) => {
           <Icon
             as={MaterialIcons}
             name={"workspace-premium"}
-            size={5}
+            size={7}
             color={Colors.primaryMintDark}
             marginRight={2}
           />
@@ -196,7 +196,7 @@ const Profiles = ({ navigation }: any) => {
         <Icon
           as={AntDesign}
           name={"right"}
-          size={5}
+          size={6}
           color={Colors.primaryMintDark}
         />
       </TouchableOpacity>
