@@ -24,6 +24,7 @@ import {
   DefaultTheme,
 } from "@react-navigation/native";
 import Chat from "./Chat/Chat";
+import { AxiosContext } from "../context/AxiosContext";
 
 const Stack = createNativeStackNavigator();
 
@@ -37,17 +38,14 @@ const Navigation = () => {
       const accessToken = await SecureStore.getItemAsync("accessToken");
       const refreshToken = await SecureStore.getItemAsync("refreshToken");
       const user = await SecureStore.getItemAsync("user");
-      const jwt = {
-        accessToken,
-        refreshToken,
-      };
+
       authContext.setAuthState({
-        accessToken: jwt.accessToken || null,
-        refreshToken: jwt.refreshToken || null,
-        authenticated: jwt.accessToken ? true : false,
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+        authenticated: accessToken ? true : false,
         user: user ? JSON.parse(user) : null,
       });
-      console.log("JWT loaded-------------", authContext.authState);
+      // console.log("JWT loaded-------------", authContext.authState);
     } catch (error: Error | any) {
       console.log("Error loading JWT", error);
       authContext.setAuthState({
@@ -156,8 +154,7 @@ const Navigation = () => {
             name="Chat"
             component={Chat}
             options={{
-              title: "",
-              headerTransparent: true,
+              headerShown: false,
               animation: "default",
             }}
           />

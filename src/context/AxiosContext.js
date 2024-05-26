@@ -35,23 +35,27 @@ const AxiosProvider = ({ children }) => {
   );
 
   authAxios.interceptors.response.use(
-    (response) => response,
-    (error) => {
-      const {
-        config,
-        response: { status },
-      } = error;
-      const originalRequest = config;
+    (response) => {
+      return response;
+    },
+    async (error) => {
+      const originalRequest = error.config;
 
-      if (status === 403) {
-        return refreshAuthLogic(originalRequest);
+      if (error.response.status === 403 && !originalRequest._retry) {
+        originalRequest._retry = true;
+        return refreshAuthLogic().then((token) => {
+          authAxios.defaults.headers.common[
+            "Authorization"
+          ] = `Bearer ${token}`;
+          originalRequest.headers["Authorization"] = `Bearer ${token}`;
+          return authAxios(originalRequest);
+        });
       }
       return Promise.reject(error);
     }
   );
 
-  const refreshAuthLogic = (failedRequest) => {
-    console.log("refreshing token");
+  const refreshAuthLogic = () => {
     const data = {
       refreshToken: authContext.authState.refreshToken,
     };
@@ -63,32 +67,18 @@ const AxiosProvider = ({ children }) => {
     };
 
     return axios(options)
-      .then(async (tokenRefreshResponse) => {
-        failedRequest.response.config.headers.Authorization =
-          "Bearer " + tokenRefreshResponse.data.accessToken;
-
+      .then((res) => {
         authContext.setAuthState({
           ...authContext.authState,
-          accessToken: tokenRefreshResponse.data.accessToken,
+          accessToken: res.data.data,
         });
-
-        await SecureStore.setItemAsync(
-          "accessToken",
-          tokenRefreshResponse.data.accessToken
-        );
-        await SecureStore.setItemAsync(
-          "refreshToken",
-          tokenRefreshResponse.data.refreshToken
-        );
-        return Promise.resolve();
+        console.log("refreshed token", res.data.message);
+        return res.data.data;
       })
-      .catch((e) => {
-        authContext?.setAuthState({
-          accessToken: null,
-          refreshToken: null,
-          // authenticated: false, // Add the 'authenticated' property
-          // user: null, // Add the 'user' property
-        });
+      .catch((error) => {
+        console.log("error refreshing token", error);
+        // authContext.logout();
+        return Promise.reject();
       });
   };
 

@@ -90,6 +90,7 @@ const Login = ({ navigation }: any) => {
           ),
         });
       } else {
+        console.log(response.data.message);
         toast.show({
           render: () => (
             <CustomToast

@@ -73,10 +73,26 @@ const Package = ({ navigation }: any) => {
     // }
   };
 
+  const calculateTotalPrice = (): number => {
+    if (duration === 1) {
+      return Number(selectedPackage?.price || 0);
+    } else if (duration === 3) {
+      return Number(selectedPackage?.price || 0) * 3;
+    } else if (duration === 6) {
+      return Number(selectedPackage?.price || 0) * 6;
+    } else {
+      return 0;
+    }
+  };
+
   const handlePurchasePackage = async () => {
     try {
       console.log("Redirect uri", redirectUri);
+      console.log(calculateTotalPrice());
+
       const url = await authAxios.post("/payment/PayOS", {
+        package_id: selectedPackage?.id,
+        amount: calculateTotalPrice(),
         redirectUri: redirectUri,
       });
 
@@ -267,7 +283,7 @@ const Package = ({ navigation }: any) => {
 
       {selectedPackage && (
         <Heading size="md" style={{ marginTop: 20, marginBottom: 10 }}>
-          Tổng cộng:{" "}
+          Tạm tính:{" "}
           {formatNumber(
             packages.filter(
               (pack: Package) => pack.id === selectedPackage.id
@@ -378,7 +394,7 @@ const Package = ({ navigation }: any) => {
               fontSize={"lg"}
               fontWeight={"bold"}
             >
-              {formatNumber(selectedPackage?.price || 0 * duration)} VNĐ
+              {formatNumber(calculateTotalPrice())} VNĐ
             </Text>
             <Button
               m={5}

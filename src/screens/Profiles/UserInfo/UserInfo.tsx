@@ -91,25 +91,27 @@ const UserInfo = () => {
   const logout = async () => {
     await authContext.logout();
     try {
-      await authAxios.get("/auth/logout");
+      const response = await authAxios.get("/auth/logout");
+      if (response.data.message === "success") {
+        console.log("Logout success");
+        await SecureStore.deleteItemAsync("accessToken");
+        await SecureStore.deleteItemAsync("refreshToken");
+        await SecureStore.deleteItemAsync("user");
+        await GoogleSignin.signOut();
+        toast.show({
+          render: () => (
+            <CustomToast
+              message="Đăng xuất thành công"
+              state="success"
+              onClose={() => {
+                toast.closeAll();
+              }}
+            />
+          ),
+        });
+      }
     } catch (error) {
       console.log(error);
-    } finally {
-      await SecureStore.deleteItemAsync("accessToken");
-      await SecureStore.deleteItemAsync("refreshToken");
-      await SecureStore.deleteItemAsync("user");
-      await GoogleSignin.signOut();
-      toast.show({
-        render: () => (
-          <CustomToast
-            message="Đăng xuất thành công"
-            state="success"
-            onClose={() => {
-              toast.closeAll();
-            }}
-          />
-        ),
-      });
     }
   };
   return (

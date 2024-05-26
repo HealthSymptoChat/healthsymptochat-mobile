@@ -54,7 +54,7 @@ const Welcome = ({ navigation }: any) => {
     // }}
     // style={{ width: "100%", paddingVertical: 20 }}
     >
-      <Image
+      {/* <Image
         source={require("../../assets/background.png")}
         alt="background"
         resizeMode="cover"
@@ -63,7 +63,7 @@ const Welcome = ({ navigation }: any) => {
         position={"absolute"}
         opacity={0.8}
         zIndex={-1}
-      />
+      /> */}
       <ScrollView>
         <Image
           source={require("../../assets/Logo.png")}

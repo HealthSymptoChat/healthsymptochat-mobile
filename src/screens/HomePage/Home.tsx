@@ -155,9 +155,34 @@ const Home = ({ navigation }: any) => {
     }
   }, [focus]);
 
-  const fetchUserInfo = () => {
-    const user = authContext.authState?.user;
-    setUsername(user?.firstName);
+  const fetchUserInfo = async () => {
+    // const user = authContext.authState?.user;
+    try {
+      const user = await authAxios.get("/user/me");
+      if (user.data.message === "success") {
+        const expirePackage: Date = user.data?.data.expirePackages;
+        if (expirePackage) {
+          if (new Date() > expirePackage) {
+            const userPackage = await authAxios.post("/user/resetPackageId");
+            if (userPackage.data?.message === "success") {
+              console.log("Reset package to null success");
+              authContext.setAuthState({
+                ...authContext.authState,
+                user: userPackage.data.data,
+              });
+              setUsername(userPackage.data?.data.firstName);
+            } else {
+              console.log("Reset package to null failed");
+            }
+          }
+        } else {
+          console.log("No package");
+          setUsername(user.data?.data.firstName);
+        }
+      }
+    } catch (error: Error | any) {
+      console.log("Error loading user", error);
+    }
   };
   return (
     <View
