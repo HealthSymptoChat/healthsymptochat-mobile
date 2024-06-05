@@ -148,7 +148,7 @@ const UserInfo = () => {
         alignItems={"center"}
       >
         <Heading marginBottom={10} fontSize="lg" color={Colors.black}>
-          {username}
+          {username ? username : "Username"}
         </Heading>
         <View
           padding={5}
@@ -326,7 +326,7 @@ const UserInfo = () => {
           name={colorMode === "dark" ? "dark-mode" : "light-mode"}
           size={6}
           color={Colors.primaryMintDark}
-          onPress={toggleColorMode}
+          // onPress={toggleColorMode}
         />
       </View>
       <Button

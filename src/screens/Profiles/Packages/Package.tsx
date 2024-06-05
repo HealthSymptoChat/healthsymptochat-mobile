@@ -27,32 +27,11 @@ import { useIsFocused } from "@react-navigation/native";
 import CustomToast from "../../../components/CustomToast";
 
 interface Package {
-  id: string;
-  title: string;
+  _id: string;
+  packageName: string;
   price: number;
-  description: string[];
+  features: string[];
 }
-
-const packages: Package[] = [
-  {
-    id: "1",
-    title: "Cơ bản",
-    price: 99000,
-    description: [
-      "Unlock powerfull time-saving tools for creating email delivery and collecting marketing data",
-      "Unlock powerfull time-saving tools for creating email delivery and collecting marketing data1",
-    ],
-  },
-  {
-    id: "2",
-    title: "Chuyên nghiệp",
-    price: 149000,
-    description: [
-      "Unlock powerfull time-saving tools for creating email delivery and collecting marketing dat2",
-      "Unlock powerfull time-saving tools for creating email delivery and collecting marketing data3",
-    ],
-  },
-];
 
 const Package = ({ navigation }: any) => {
   const { authAxios }: any = useContext(AxiosContext);
@@ -61,7 +40,7 @@ const Package = ({ navigation }: any) => {
   const [selectedPackage, setSelectedPackage] = useState<Package>();
   const [duration, setDuration] = useState<number>(3);
   const { isOpen, onOpen, onClose } = useDisclose();
-  const [renderTime, setRenderTime] = useState(0);
+  const [packages, setPackages] = useState<Package[]>([]);
   const redirectUri = Linking.createURL("/");
 
   const handleChoosePackage = (packageId: Package) => {
@@ -91,7 +70,7 @@ const Package = ({ navigation }: any) => {
       console.log(calculateTotalPrice());
 
       const url = await authAxios.post("/payment/PayOS", {
-        package_id: selectedPackage?.id,
+        package_id: selectedPackage?._id,
         amount: calculateTotalPrice(),
         redirectUri: redirectUri,
       });
@@ -110,6 +89,23 @@ const Package = ({ navigation }: any) => {
       console.log("Error purchase package", error);
     }
   };
+
+  const fetchPackage = async () => {
+    try {
+      const response = await authAxios.get("/package/getAllPackages");
+      if (response.data.message === "success") {
+        setPackages(response.data.data);
+      }
+    } catch (error: any) {
+      console.log("Error fetching package", error);
+    }
+  };
+
+  useEffect(() => {
+    if (focus) {
+      fetchPackage();
+    }
+  }, [focus]);
   useEffect(() => {
     const handleOpenURL = (event: any) => {
       console.log("App was opened with URL: " + event.url);
@@ -153,8 +149,9 @@ const Package = ({ navigation }: any) => {
       <Text fontSize="md" color={"gray.500"}>
         Mở khóa tất cả các tính năng với gói premium
       </Text>
-      {packages.map((pkg) => (
+      {packages.map((pkg, idx) => (
         <Pressable
+          key={idx}
           style={{ marginVertical: 10 }}
           onPress={() => handleChoosePackage(pkg)}
         >
@@ -171,7 +168,11 @@ const Package = ({ navigation }: any) => {
                 p="5"
                 rounded="30"
                 borderStyle={"dashed"}
-                bg={pkg.id === "2" ? "amber.100" : "coolGray.200"}
+                bg={
+                  pkg.packageName === "Chuyên nghiệp"
+                    ? "amber.100"
+                    : "coolGray.200"
+                }
               >
                 <View
                   display={"flex"}
@@ -180,7 +181,7 @@ const Package = ({ navigation }: any) => {
                   justifyContent={"space-between"}
                 >
                   <View display={"flex"} flexDirection={"column"}>
-                    <Heading size="md">{pkg.title}</Heading>
+                    <Heading size="md">{pkg.packageName}</Heading>
                     <Text mt="3" fontWeight={"semibold"} fontSize="md">
                       {formatNumber(pkg.price)} VNĐ
                     </Text>
@@ -260,14 +261,14 @@ const Package = ({ navigation }: any) => {
       <View>
         {selectedPackage
           ? packages
-              .filter((pack: Package) => pack.id === selectedPackage.id)[0]
-              .description.map((desc) => (
+              .filter((pack: Package) => pack._id === selectedPackage._id)[0]
+              .features.map((feat) => (
                 <View
-                  key={desc}
+                  key={feat}
                   display={"flex"}
                   flexDirection={"row"}
                   alignItems={"center"}
-                  justifyContent={"center"}
+                  justifyContent={"flex-start"}
                 >
                   <Icon
                     as={Octicons}
@@ -275,7 +276,9 @@ const Package = ({ navigation }: any) => {
                     size={5}
                     color={Colors.primaryMintDark}
                   />
-                  <Text margin={2}>{desc}</Text>
+                  <Text fontSize={"md"} margin={2}>
+                    {feat}
+                  </Text>
                 </View>
               ))
           : null}
@@ -286,7 +289,7 @@ const Package = ({ navigation }: any) => {
           Tạm tính:{" "}
           {formatNumber(
             packages.filter(
-              (pack: Package) => pack.id === selectedPackage.id
+              (pack: Package) => pack._id === selectedPackage._id
             )[0].price
           ) || 0}{" "}
           VNĐ
@@ -335,7 +338,7 @@ const Package = ({ navigation }: any) => {
                 fontWeight={"bold"}
                 color={Colors.black}
               >
-                {selectedPackage?.title}
+                {selectedPackage?.packageName}
               </Text>
             </View>
             <View

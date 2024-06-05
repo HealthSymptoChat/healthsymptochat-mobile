@@ -102,6 +102,16 @@ const Welcome = ({ navigation }: any) => {
           >
             Đăng nhập
           </Button>
+          {/* <Button
+            // endIcon={<Icon as={Login} name="login-variant" size="lg" />}
+            rounded="full"
+            variant="outline"
+            _text={{ color: Colors.primaryMintDark }}
+            borderColor={Colors.primaryMintDark}
+            onPress={() => navigation.navigate("TabBar")}
+          >
+            Home
+          </Button> */}
         </View>
       </ScrollView>
     </SafeAreaView>

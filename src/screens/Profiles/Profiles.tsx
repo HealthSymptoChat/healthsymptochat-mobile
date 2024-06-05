@@ -99,7 +99,7 @@ const Profiles = ({ navigation }: any) => {
           justifyContent: "space-between",
           alignItems: "center",
         }}
-        onPress={() => navigation.navigate("MedicationSchedule")}
+        // onPress={() => navigation.navigate("MedicationSchedule")}
       >
         <View
           style={{

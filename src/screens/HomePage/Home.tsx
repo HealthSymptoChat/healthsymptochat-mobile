@@ -23,47 +23,47 @@ const { width, height } = Dimensions.get("window");
 
 const data = [
   {
-    title: "Chăm sóc sức khỏe mùa đông",
+    title: "Chăm sóc sức khỏe mùa mưa",
     description: "Chăm sóc sức khỏe mùa ...",
-    image: "https://via.placeholder.com/320x196.png",
+    image: require("../../../assets/rain.png"),
   },
   {
-    title: "Chăm sóc sức khỏe mùa đông",
+    title: "Chăm sóc sức khỏe mùa mưa",
     description: "Chăm sóc sức khỏe mùa ...",
-    image: "https://via.placeholder.com/320x196.png",
+    image: require("../../../assets/summer.png"),
   },
   {
-    title: "Chăm sóc sức khỏe mùa đông",
+    title: "Chăm sóc sức khỏe mùa mưa",
     description: "Chăm sóc sức khỏe mùa ...",
-    image: "https://via.placeholder.com/320x196.png",
+    image: require("../../../assets/fall.png"),
   },
   {
-    title: "Chăm sóc sức khỏe mùa đông",
+    title: "Chăm sóc sức khỏe mùa mưa",
     description: "Chăm sóc sức khỏe mùa ...",
-    image: "https://via.placeholder.com/320x196.png",
+    image: require("../../../assets/winter.png"),
   },
 ];
 
 const ads = [
   {
     title: "Giảm 40%",
-    description: "Thuốc giảm đau",
-    image: "https://via.placeholder.com/320x196.png",
+    description: "Probiotics",
+    image: require("../../../assets/medicine.png"),
   },
   {
     title: "Giảm 40%",
-    description: "Thuốc giảm đau",
-    image: "https://via.placeholder.com/320x196.png",
+    description: "Probiotics",
+    image: require("../../../assets/medicine1.png"),
   },
   {
     title: "Giảm 40%",
-    description: "Thuốc giảm đau",
-    image: "https://via.placeholder.com/320x196.png",
+    description: "Probiotics",
+    image: require("../../../assets/medicine.png"),
   },
   {
     title: "Giảm 40%",
-    description: "Thuốc giảm đau",
-    image: "https://via.placeholder.com/320x196.png",
+    description: "Probiotics",
+    image: require("../../../assets/medicine1.png"),
   },
 ];
 
@@ -124,6 +124,7 @@ const Home = ({ navigation }: any) => {
   const { authAxios }: any = useContext(AxiosContext);
   const authContext: any = useContext(AuthContext);
   const [username, setUsername] = React.useState<string>("");
+  const [patientHistory, setPatientHistory] = React.useState<Object>({});
 
   const handleOnScroll = (e: any) => {
     Animated.event([{ nativeEvent: { contentOffset: { x: scrollX } } }], {
@@ -152,6 +153,7 @@ const Home = ({ navigation }: any) => {
   useEffect(() => {
     if (focus) {
       fetchUserInfo();
+      fetchPatientHistory();
     }
   }, [focus]);
 
@@ -161,7 +163,8 @@ const Home = ({ navigation }: any) => {
       const user = await authAxios.get("/user/me");
       if (user.data.message === "success") {
         const expirePackage: Date = user.data?.data.expirePackages;
-        if (expirePackage) {
+        const packageId = user.data?.data.packageId;
+        if (expirePackage && packageId) {
           if (new Date() > expirePackage) {
             const userPackage = await authAxios.post("/user/resetPackageId");
             if (userPackage.data?.message === "success") {
@@ -176,12 +179,41 @@ const Home = ({ navigation }: any) => {
             }
           }
         } else {
-          console.log("No package");
+          console.log("Empty package");
           setUsername(user.data?.data.firstName);
         }
       }
     } catch (error: Error | any) {
       console.log("Error loading user", error);
+    }
+  };
+
+  const fetchPatientHistory = async () => {
+    try {
+      const res = await authAxios.get("/patient/getPatientByUserId");
+      if (res.data.message === "success") {
+        setPatientHistory(res.data?.data || {});
+      } else {
+        console.log("Empty patient history");
+        setPatientHistory({});
+      }
+    } catch (error: Error | any) {
+      console.log("Error loading patient history", error);
+      setPatientHistory({});
+    }
+  };
+
+  const handleCheckUserCondition = async () => {
+    // have > 10 assetsent or create account > 10 days
+    const user = authContext.authState?.user;
+    const packageId = user?.packageId;
+    const expirePackage = user?.expirePackages;
+
+    // check if user fill in health info
+    if (Object.keys(patientHistory).length === 0) {
+      navigation.navigate("HealthInfoInput");
+    } else {
+      navigation.navigate("Chat");
     }
   };
   return (
@@ -218,7 +250,7 @@ const Home = ({ navigation }: any) => {
             left={"23%"}
           >
             <View width={"70%"} p={2} bg={Colors.white} borderRadius={"3xl"}>
-              <Heading fontSize={"lg"}>Chào {username}!</Heading>
+              <Heading fontSize={"lg"}>Chào {username || "bạn"} !</Heading>
               <Text fontStyle={"normal"} color={"gray.500"}>
                 Hôm nay bạn cảm thấy thế nào?
               </Text>
@@ -287,7 +319,7 @@ const Home = ({ navigation }: any) => {
           variant={"outline"}
           borderColor={Colors.primaryMintDark}
           _text={{ fontWeight: "bold", fontSize: "lg" }}
-          onPress={() => navigation.navigate("Chat")}
+          onPress={() => handleCheckUserCondition()}
           leftIcon={
             <Image
               source={require("../../../assets/Logo_no_text.png")}
@@ -362,7 +394,7 @@ const Home = ({ navigation }: any) => {
                 marginX={2}
                 borderRadius={"3xl"}
                 borderStyle={"dashed"}
-                bg={Colors.primaryMint}
+                bg={Colors.grey}
                 display={"flex"}
                 flexDirection={"row"}
                 alignItems={"center"}
@@ -371,9 +403,7 @@ const Home = ({ navigation }: any) => {
                   width={"1/2"}
                   height={150}
                   alignSelf={"center"}
-                  source={{
-                    uri: item.item.image,
-                  }}
+                  source={item.item.image}
                   roundedLeft={"3xl"}
                   alt="Healthy"
                   resizeMode="cover"
@@ -407,10 +437,11 @@ const Home = ({ navigation }: any) => {
               justifyContent={"space-between"}
             >
               <Heading fontSize={"lg"}>Thông tin các bệnh theo mùa</Heading>
-              <View
+              <Pressable
                 display={"flex"}
                 flexDirection={"row"}
                 alignItems={"center"}
+                onPress={() => navigation.navigate("Information")}
               >
                 <Text color={Colors.primaryMintDark}>Xem tất cả</Text>
                 <Icon
@@ -419,7 +450,7 @@ const Home = ({ navigation }: any) => {
                   size="md"
                   color={Colors.primaryMintDark}
                 />
-              </View>
+              </Pressable>
             </View>
             <FlatList
               horizontal
@@ -428,25 +459,19 @@ const Home = ({ navigation }: any) => {
               snapToInterval={320}
               data={data}
               renderItem={(item) => (
-                <Pressable
-                  w={300}
-                  marginX={2}
-                  // onPress={() => navigation.navigate("Package")}
-                >
+                <Pressable w={300} marginX={2}>
                   {({ isPressed }) => {
                     return (
                       <View
                         style={{ transform: [{ scale: isPressed ? 0.96 : 1 }] }}
                       >
                         <Image
-                          w={300}
-                          h={170}
-                          source={{
-                            uri: item.item.image,
-                          }}
+                          width={300}
+                          height={170}
+                          source={item.item.image}
                           rounded={"lg"}
                           alt="Healthy"
-                          resizeMode="cover"
+                          resizeMode="contain"
                         />
                         <Text fontWeight={"semibold"} fontSize="lg">
                           {item.item.title}

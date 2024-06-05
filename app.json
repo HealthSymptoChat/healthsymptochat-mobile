@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "healthsymptochat-mobile",
-    "slug": "healthsymptochat-mobile",
+    "slug": "healthsymptochat-client",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/Logo.png",
@@ -27,7 +27,7 @@
     },
     "extra": {
       "eas": {
-        "projectId": "179fb1ad-051d-42f1-bb8f-4ff59397dcfb"
+        "projectId": "c7612fc9-3303-4396-9d1f-86a28c493d77"
       }
     },
     "runtimeVersion": "1.0.0",

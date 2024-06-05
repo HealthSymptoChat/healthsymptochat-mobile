@@ -25,6 +25,10 @@ import {
 } from "@react-navigation/native";
 import Chat from "./Chat/Chat";
 import { AxiosContext } from "../context/AxiosContext";
+import Result from "./Chat/Result";
+import HealthInfo from "./Profiles/HealthInfo/HealthInfo";
+import HealthInfoInput from "./Chat/HealthInfoInput";
+import Information from "./Information/Information";
 
 const Stack = createNativeStackNavigator();
 
@@ -159,6 +163,14 @@ const Navigation = () => {
             }}
           />
           <Stack.Screen
+            name="Result"
+            component={Result}
+            options={{
+              headerShown: false,
+              animation: "slide_from_right",
+            }}
+          />
+          <Stack.Screen
             name="Package"
             component={Package}
             options={{
@@ -202,6 +214,31 @@ const Navigation = () => {
                 colorMode === "dark" ? Colors.white : Colors.black,
             }}
           />
+          <Stack.Screen
+            name="HealthInfo"
+            component={HealthInfo}
+            options={{
+              title: "",
+              headerTransparent: true,
+              headerTintColor:
+                colorMode === "dark" ? Colors.white : Colors.black,
+            }}
+          />
+          <Stack.Screen
+            name="HealthInfoInput"
+            component={HealthInfoInput}
+            options={{
+              headerShown: false,
+              animation: "default",
+            }}
+          />
+          {/* <Stack.Screen
+            name="Information"
+            component={Information}
+            options={{
+              headerShown: false,
+            }}
+          /> */}
         </Stack.Navigator>
       )}
     </NavigationContainer>
