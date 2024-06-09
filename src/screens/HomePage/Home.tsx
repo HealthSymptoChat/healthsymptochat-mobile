@@ -194,7 +194,7 @@ const Home = ({ navigation }: any) => {
       if (res.data.message === "success") {
         setPatientHistory(res.data?.data || {});
       } else {
-        console.log("Empty patient history");
+        console.log("Patient history is empty");
         setPatientHistory({});
       }
     } catch (error: Error | any) {

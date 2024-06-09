@@ -18,16 +18,18 @@ import { AntDesign, FontAwesome5 } from "@expo/vector-icons";
 import { Alert, Animated, Dimensions } from "react-native";
 import WaveHeader from "../../components/WaveHeader";
 import { AuthContext } from "../../context/AuthContext";
+import { useBackHandler } from "@react-native-community/hooks";
 
 const { width, height } = Dimensions.get("window");
 
 const Chat = ({ navigation }: any) => {
-  const [currentStep, setCurrentStep] = useState(0);
+  const [currentStep, setCurrentStep] = useState<number>(0);
   const slideAnimation = new Animated.Value(0);
-  const [isOpen, setIsOpen] = useState(false);
   const cancelRef = useRef(null);
   const authContext: any = useContext(AuthContext);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [step, setStep] = useState<number>(0);
+  const stepSize = 10;
   // answer data
   const [question1, setQuestion1] = useState<string>("");
   const [question2, setQuestion2] = useState<string>("");
@@ -36,6 +38,43 @@ const Chat = ({ navigation }: any) => {
   const [question5, setQuestion5] = useState<string>("");
   const [question6, setQuestion6] = useState<string>("");
   const [question7, setQuestion7] = useState<string>("");
+  const [question2Other, setQuestion2Other] = useState<string>("");
+  const [question3Other, setQuestion3Other] = useState<string>("");
+  const [question4Other, setQuestion4Other] = useState<string>("");
+  const questions = [
+    question1,
+    question2,
+    question3,
+    question4,
+    question5,
+    question6,
+    question7,
+  ];
+  const steps = {
+    10: [
+      "Sốt",
+      "Ho",
+      "Đau họng",
+      "Chảy nước mũi",
+      "Nghẹt mũi",
+      "Đau đầu",
+      "Đau cơ",
+      "Mệt mỏi",
+      "Mất vị giác hoặc khứu giác",
+      "",
+    ],
+    20: ["Một ngày qua", "Ba ngày qua", "Một tuần qua", "Một tháng qua", ""],
+    30: [
+      "Khó ngủ",
+      "Mất tập trung",
+      "Giảm cân",
+      "Yếu ớt",
+      "Khó chịu",
+      "Lo lắng",
+      "Mất cảm giác ngon miệng",
+      "",
+    ],
+  };
 
   const handleNext = () => {
     Animated.timing(slideAnimation, {
@@ -43,7 +82,10 @@ const Chat = ({ navigation }: any) => {
       duration: 400,
       useNativeDriver: true,
     }).start(() => {
-      setCurrentStep(currentStep + 10);
+      setCurrentStep(currentStep + stepSize);
+      if (currentStep === step) {
+        setStep(step + stepSize);
+      }
       slideAnimation.setValue(0);
     });
   };
@@ -54,7 +96,7 @@ const Chat = ({ navigation }: any) => {
       duration: 300,
       useNativeDriver: true,
     }).start(() => {
-      setCurrentStep(currentStep - 10);
+      setCurrentStep(currentStep - stepSize);
       slideAnimation.setValue(0);
     });
   };
@@ -85,11 +127,49 @@ const Chat = ({ navigation }: any) => {
       case 0:
         return question1 !== "";
       case 10:
-        return question2 !== "";
+        if (question2 !== "") {
+          if (
+            question2 !== "Sốt" &&
+            question2 !== "Ho" &&
+            question2 !== "Đau họng" &&
+            question2 !== "Chảy nước mũi" &&
+            question2 !== "Nghẹt mũi" &&
+            question2 !== "Đau đầu" &&
+            question2 !== "Đau cơ" &&
+            question2 !== "Mệt mỏi" &&
+            question2 !== "Mất vị giác hoặc khứu giác"
+          ) {
+            return question2Other !== "";
+          }
+          return true;
+        }
       case 20:
-        return question3 !== "";
+        if (question3 !== "") {
+          if (
+            question3 !== "Một ngày qua" &&
+            question3 !== "Ba ngày qua" &&
+            question3 !== "Một tuần qua" &&
+            question3 !== "Một tháng qua"
+          ) {
+            return question3Other !== "";
+          }
+          return true;
+        }
       case 30:
-        return question4 !== "";
+        if (question4 !== "") {
+          if (
+            question4 !== "Khó ngủ" &&
+            question4 !== "Mất tập trung" &&
+            question4 !== "Giảm cân" &&
+            question4 !== "Yếu ớt" &&
+            question4 !== "Khó chịu" &&
+            question4 !== "Lo lắng" &&
+            question4 !== "Mất cảm giác ngon miệng"
+          ) {
+            return question4Other !== "";
+          }
+          return true;
+        }
       case 40:
         return question5 !== "";
       case 50:
@@ -101,7 +181,7 @@ const Chat = ({ navigation }: any) => {
     }
   };
 
-  const clearInput = () => {
+  const clearData = () => {
     setQuestion1("");
     setQuestion2("");
     setQuestion3("");
@@ -109,6 +189,11 @@ const Chat = ({ navigation }: any) => {
     setQuestion5("");
     setQuestion6("");
     setQuestion7("");
+    setQuestion2Other("");
+    setQuestion3Other("");
+    setQuestion4Other("");
+    setCurrentStep(0);
+    setStep(0);
   };
 
   useEffect(() => {
@@ -117,13 +202,37 @@ const Chat = ({ navigation }: any) => {
         setIsLoading(true);
         // loop this loading for 4 seconds
         setTimeout(() => {
+          console.log("Data: ", { question1, question2, question3, question4 });
+
+          navigation.navigate("Result", {
+            data: {
+              question1,
+              question2,
+              question3,
+              question4,
+              question5,
+              question6,
+              question7,
+            },
+          });
+          clearData();
           setIsLoading(false);
-          clearInput();
-          navigation.navigate("Result", { canGoBack: false });
         }, 4000);
         return;
+      } else {
+        // if (
+        //   (currentStep === 0 && question1 !== "") ||
+        //   (currentStep === 10 && question2 !== "") ||
+        //   (currentStep === 20 && question3 !== "") ||
+        //   (currentStep === 30 && question4 !== "") ||
+        //   (currentStep === 40 && question5 !== "") ||
+        //   (currentStep === 50 && question6 !== "") ||
+        //   (currentStep === 60 && question7 !== "")
+        // ) {
+        //   handleNext();
+        // }
+        handleNext();
       }
-      handleNext();
     }
   }, [
     question1,
@@ -135,32 +244,31 @@ const Chat = ({ navigation }: any) => {
     question7,
   ]);
 
-  useEffect(() => {
-    const unsubscribe = navigation.addListener("beforeRemove", (e: any) => {
-      if (currentStep === 0) {
-        return;
-      }
-      e.preventDefault();
-      Alert.alert(
-        "Thoát khỏi chẩn đoán",
-        "Dữ liệu hiện tại của bạn sẽ không được lưu lại",
-        [
-          {
-            text: "Hủy",
-            style: "cancel",
-            onPress: () => {},
+  useBackHandler(() => {
+    if (currentStep === 0) {
+      return false;
+    }
+    Alert.alert(
+      "Thoát khỏi chẩn đoán",
+      "Dữ liệu hiện tại của bạn sẽ không được lưu lại",
+      [
+        {
+          text: "Hủy",
+          style: "cancel",
+          onPress: () => {},
+        },
+        {
+          text: "Thoát",
+          style: "destructive",
+          onPress: () => {
+            clearData();
+            navigation.navigate("TabBar");
           },
-          {
-            text: "Thoát",
-            style: "destructive",
-            onPress: () => navigation.dispatch(e.data.action),
-          },
-        ]
-      );
-    });
-
-    return unsubscribe;
-  }, [navigation, currentStep]);
+        },
+      ]
+    );
+    return true;
+  });
 
   return (
     <View
@@ -190,17 +298,6 @@ const Chat = ({ navigation }: any) => {
           </Text>
         </View>
       )}
-      {/* <IconButton
-        position={"absolute"}
-        top={5}
-        right={5}
-        bg={Colors.primaryMint}
-        rounded={"full"}
-        zIndex={99}
-        _pressed={{ bg: "coolGray.400" }}
-        icon={<Icon as={AntDesign} name="close" color={Colors.white} />}
-        onPress={() => setIsOpen(true)}
-      /> */}
       <WaveHeader />
       <ScrollView marginTop={50}>
         <View
@@ -715,7 +812,14 @@ const Chat = ({ navigation }: any) => {
                   rounded={"full"}
                   placeholder="Thời gian khác"
                   marginTop={2}
-                  // value={question3}
+                  value={
+                    question3 === "Một ngày qua" ||
+                    question3 === "Ba ngày qua" ||
+                    question3 === "Một tuần qua" ||
+                    question3 === "Một tháng qua"
+                      ? ""
+                      : question3
+                  }
                   onChangeText={(text) => setQuestion3(text)}
                 />
               </Animated.View>
@@ -875,7 +979,17 @@ const Chat = ({ navigation }: any) => {
                   rounded={"full"}
                   placeholder="Triệu chứng khác"
                   marginTop={2}
-                  // value={question4}
+                  value={
+                    question4 === "Khó ngủ" ||
+                    question4 === "Mất tập trung" ||
+                    question4 === "Giảm cân" ||
+                    question4 === "Yếu ớt" ||
+                    question4 === "Khó chịu" ||
+                    question4 === "Lo lắng" ||
+                    question4 === "Mất cảm giác ngon miệng"
+                      ? ""
+                      : question4
+                  }
                   onChangeText={(text) => setQuestion4(text)}
                 />
               </Animated.View>
@@ -897,6 +1011,7 @@ const Chat = ({ navigation }: any) => {
                   flexWrap={"wrap"}
                 >
                   <Button
+                    width={"24"}
                     rounded={"full"}
                     marginY={1}
                     bg={
@@ -914,6 +1029,8 @@ const Chat = ({ navigation }: any) => {
                     Có
                   </Button>
                   <Button
+                    width={"24"}
+                    textAlign={"center"}
                     rounded={"full"}
                     marginY={1}
                     bg={
@@ -933,13 +1050,6 @@ const Chat = ({ navigation }: any) => {
                     Không
                   </Button>
                 </Button.Group>
-                <Input
-                  rounded={"full"}
-                  placeholder="Khác"
-                  marginTop={2}
-                  // value={question5}
-                  onChangeText={(text) => setQuestion5(text)}
-                />
               </Animated.View>
             )}
             {currentStep === 50 && (
@@ -959,6 +1069,7 @@ const Chat = ({ navigation }: any) => {
                   flexWrap={"wrap"}
                 >
                   <Button
+                    width={"24"}
                     rounded={"full"}
                     marginY={1}
                     bg={
@@ -976,6 +1087,8 @@ const Chat = ({ navigation }: any) => {
                     Có
                   </Button>
                   <Button
+                    width={"24"}
+                    textAlign={"center"}
                     rounded={"full"}
                     marginY={1}
                     bg={
@@ -995,13 +1108,6 @@ const Chat = ({ navigation }: any) => {
                     Không
                   </Button>
                 </Button.Group>
-                <Input
-                  rounded={"full"}
-                  placeholder="Khác"
-                  marginTop={2}
-                  // value={question6}
-                  onChangeText={(text) => setQuestion6(text)}
-                />
               </Animated.View>
             )}
             {currentStep === 60 && (
@@ -1021,6 +1127,7 @@ const Chat = ({ navigation }: any) => {
                   flexWrap={"wrap"}
                 >
                   <Button
+                    width={"24"}
                     rounded={"full"}
                     marginY={1}
                     bg={
@@ -1038,6 +1145,8 @@ const Chat = ({ navigation }: any) => {
                     Có
                   </Button>
                   <Button
+                    width={"24"}
+                    textAlign={"center"}
                     rounded={"full"}
                     marginY={1}
                     bg={
@@ -1057,13 +1166,6 @@ const Chat = ({ navigation }: any) => {
                     Không
                   </Button>
                 </Button.Group>
-                <Input
-                  rounded={"full"}
-                  placeholder="Khác"
-                  marginTop={2}
-                  // value={question7}
-                  onChangeText={(text) => setQuestion7(text)}
-                />
               </Animated.View>
             )}
           </View>
@@ -1097,24 +1199,48 @@ const Chat = ({ navigation }: any) => {
           ) : (
             <Spacer />
           )}
-          {/* {currentStep === 60 && question7 !== "" ? (
-            <Button
-              alignSelf={"flex-end"}
-              rounded={"full"}
-              bg={Colors.primaryMintDark}
-              rightIcon={
-                <Icon
-                  as={AntDesign}
-                  name="check"
-                  size="sm"
-                  color={Colors.white}
-                />
-              }
-              onPress={() => navigation.navigate("Result")}
-            >
-              Kết thúc
-            </Button>
-          ) : (
+          {/* {(currentStep === 10 &&
+            question2 !== "Sốt" &&
+            question2 !== "Ho" &&
+            question2 !== "Đau họng" &&
+            question2 !== "Chảy nước mũi" &&
+            question2 !== "Nghẹt mũi" &&
+            question2 !== "Đau đầu" &&
+            question2 !== "Đau cơ" &&
+            question2 !== "Mệt mỏi" &&
+            question2 !== "Mất vị giác hoặc khứu giác" &&
+            question2 !== "") ||
+          (currentStep === 20 &&
+            question3 !== "Một ngày qua" &&
+            question3 !== "Ba ngày qua" &&
+            question3 !== "Một tuần qua" &&
+            question3 !== "Một tháng qua" &&
+            question3 !== "") ||
+          (currentStep === 30 &&
+            question4 !== "Khó ngủ" &&
+            question4 !== "Mất tập trung" &&
+            question4 !== "Giảm cân" &&
+            question4 !== "Yếu ớt" &&
+            question4 !== "Khó chịu" &&
+            question4 !== "Lo lắng" &&
+            question4 !== "Mất cảm giác ngon miệng" &&
+            question4 !== "") ||
+          (((currentStep === 0 && question1 !== "") ||
+            (currentStep === 10 && question2 !== "") ||
+            (currentStep === 20 && question3 !== "") ||
+            (currentStep === 30 && question4 !== "") ||
+            (currentStep === 40 && question5 !== "") ||
+            (currentStep === 50 && question6 !== "") ||
+            (currentStep === 60 && question7 !== "")) &&
+            currentStep < step) ? ( */}
+          {(steps[currentStep as keyof typeof steps] &&
+            !steps[currentStep as keyof typeof steps].includes(
+              questions[currentStep / 10]
+            )) ||
+          (questions.some(
+            (question, index) => index * 10 === currentStep && question !== ""
+          ) &&
+            currentStep < step) ? (
             <Button
               alignSelf={"flex-end"}
               rounded={"full"}
@@ -1131,6 +1257,34 @@ const Chat = ({ navigation }: any) => {
             >
               Tiếp theo
             </Button>
+          ) : (
+            <Spacer />
+          )}
+          {/* {(currentStep === 0 && question1 !== "") ||
+          (currentStep === 10 && question2 !== "") ||
+          (currentStep === 20 && question3 !== "") ||
+          (currentStep === 30 && question4 !== "") ||
+          (currentStep === 40 && question5 !== "") ||
+          (currentStep === 50 && question6 !== "") ||
+          (currentStep === 60 && question7 !== "") ? (
+            <Button
+              alignSelf={"flex-end"}
+              rounded={"full"}
+              bg={Colors.primaryMintDark}
+              rightIcon={
+                <Icon
+                  as={AntDesign}
+                  name="right"
+                  size="sm"
+                  color={Colors.white}
+                />
+              }
+              onPress={handleNext}
+            >
+              Tiếp theo
+            </Button>
+          ) : (
+            <Spacer />
           )} */}
         </View>
         <Progress

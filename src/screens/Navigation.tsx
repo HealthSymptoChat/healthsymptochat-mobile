@@ -9,7 +9,6 @@ import ForgetPassword from "./Authentication/Login/ForgetPassword";
 import VerifyCode from "./Authentication/Login/VerifyCode";
 import ResetPassword from "./Authentication/Login/ResetPassword";
 import Package from "./Profiles/Packages/Package";
-import Payment from "./Profiles/Payment/Payment";
 import { Spinner, useColorMode } from "native-base";
 import { Colors } from "../theme/Theme";
 import VerifyOTP from "./Authentication/Signup/VerifyOTP";
@@ -29,6 +28,7 @@ import Result from "./Chat/Result";
 import HealthInfo from "./Profiles/HealthInfo/HealthInfo";
 import HealthInfoInput from "./Chat/HealthInfoInput";
 import Information from "./Information/Information";
+import AssessmentDetail from "./Profiles/AssessmentHistory/AssessmentDetail";
 
 const Stack = createNativeStackNavigator();
 
@@ -184,19 +184,6 @@ const Navigation = () => {
             }}
           />
           <Stack.Screen
-            name="Payment"
-            component={Payment}
-            options={{
-              title: "Thanh toán",
-              headerStyle: {
-                backgroundColor:
-                  colorMode === "dark" ? Colors.black : Colors.white,
-              },
-              headerTintColor:
-                colorMode === "dark" ? Colors.white : Colors.black,
-            }}
-          />
-          <Stack.Screen
             name="UserInfo"
             component={UserInfo}
             options={{
@@ -207,6 +194,16 @@ const Navigation = () => {
           <Stack.Screen
             name="AssessmentHistory"
             component={AssessmentHistory}
+            options={{
+              title: "",
+              headerTransparent: true,
+              headerTintColor:
+                colorMode === "dark" ? Colors.white : Colors.black,
+            }}
+          />
+          <Stack.Screen
+            name="AssessmentDetail"
+            component={AssessmentDetail}
             options={{
               title: "",
               headerTransparent: true,

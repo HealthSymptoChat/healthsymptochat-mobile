@@ -6,7 +6,7 @@ import { Octicons, FontAwesome6 } from "@expo/vector-icons";
 
 const { width, height } = Dimensions.get("window");
 
-const AssessmentHistory = () => {
+const AssessmentHistory = ({ navigation }: any) => {
   return (
     <View
       _dark={{
@@ -47,7 +47,10 @@ const AssessmentHistory = () => {
               size={12}
               color={Colors.primaryMintDark}
             />
-            <Pressable w={"2/3"}>
+            <Pressable
+              w={"2/3"}
+              onPress={() => navigation.navigate("AssessmentDetail")}
+            >
               {({ isPressed }) => {
                 return (
                   <View
@@ -66,6 +69,7 @@ const AssessmentHistory = () => {
                       ],
                     }}
                     padding={5}
+                    shadow={6}
                     borderRadius={20}
                   >
                     <Heading
@@ -78,7 +82,7 @@ const AssessmentHistory = () => {
                       fontSize={"lg"}
                       fontWeight={"bold"}
                     >
-                      Đau bụng
+                      Cảm cúm
                     </Heading>
                     <View
                       display={"flex"}

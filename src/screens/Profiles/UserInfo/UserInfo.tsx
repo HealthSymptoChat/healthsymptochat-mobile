@@ -89,15 +89,17 @@ const UserInfo = () => {
   };
 
   const logout = async () => {
-    await authContext.logout();
     try {
-      const response = await authAxios.get("/auth/logout");
+      const response = await authAxios.post("/auth/logout", {
+        refreshToken: authContext.authState.refreshToken,
+      });
       if (response.data.message === "success") {
         console.log("Logout success");
         await SecureStore.deleteItemAsync("accessToken");
         await SecureStore.deleteItemAsync("refreshToken");
         await SecureStore.deleteItemAsync("user");
         await GoogleSignin.signOut();
+        await authContext.logout();
         toast.show({
           render: () => (
             <CustomToast

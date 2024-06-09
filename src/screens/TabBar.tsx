@@ -22,7 +22,7 @@ const TabBar = () => {
       />
       <Tab.Navigator
         initialRouteName="Home"
-        // shifting={true}
+        shifting={true}
         activeColor={Colors.primaryMintDark}
         inactiveColor={colorMode === "dark" ? Colors.white : Colors.black}
         barStyle={{
