@@ -11,6 +11,7 @@ const { Provider } = AxiosContext;
 const AxiosProvider = ({ children }) => {
   const authContext = useContext(AuthContext);
 
+  // const baseURL = "https://hsc-sever.vercel.app/api/v1";
   const baseURL = "http://10.0.2.2:5000/api/v1";
 
   const authAxios = axios.create({
@@ -93,12 +94,9 @@ const AxiosProvider = ({ children }) => {
         const refreshToken = authContext.authState.refreshToken;
         if (refreshToken) {
           try {
-            const response = await axios.post(
-              `http://10.0.2.2:5000/api/v1/auth/token`,
-              {
-                refreshToken,
-              }
-            );
+            const response = await axios.post(baseURL + "/auth/token", {
+              refreshToken,
+            });
             // don't use axious instance that already configured for refresh token api call
             const newAccessToken = response.data.data;
             authContext.setAuthState({

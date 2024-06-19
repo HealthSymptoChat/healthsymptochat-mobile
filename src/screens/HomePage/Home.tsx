@@ -162,10 +162,12 @@ const Home = ({ navigation }: any) => {
     try {
       const user = await authAxios.get("/user/me");
       if (user.data.message === "success") {
-        const expirePackage: Date = user.data?.data.expirePackages;
-        const packageId = user.data?.data.packageId;
-        if (expirePackage && packageId) {
-          if (new Date() > expirePackage) {
+        const expirePackageDate: Date = new Date(
+          user.data?.data.expirePackages || ""
+        );
+        const packageId = user.data?.data.package;
+        if (expirePackageDate && packageId) {
+          if (new Date() > expirePackageDate) {
             const userPackage = await authAxios.post("/user/resetPackageId");
             if (userPackage.data?.message === "success") {
               console.log("Reset package to null success");

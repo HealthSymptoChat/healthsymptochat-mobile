@@ -19,17 +19,23 @@ import { Alert, Animated, Dimensions } from "react-native";
 import WaveHeader from "../../components/WaveHeader";
 import { AuthContext } from "../../context/AuthContext";
 import { useBackHandler } from "@react-native-community/hooks";
+import { useIsFocused } from "@react-navigation/native";
+import { AxiosContext } from "../../context/AxiosContext";
+import UserInfoProps from "../../interface/UserInfo";
 
 const { width, height } = Dimensions.get("window");
 
 const Chat = ({ navigation }: any) => {
+  const focus = useIsFocused();
   const [currentStep, setCurrentStep] = useState<number>(0);
   const slideAnimation = new Animated.Value(0);
   const cancelRef = useRef(null);
   const authContext: any = useContext(AuthContext);
+  const { authAxios }: any = useContext(AxiosContext);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [step, setStep] = useState<number>(0);
   const stepSize = 10;
+  const [userInfo, setUserInfo] = useState<UserInfoProps>();
   // answer data
   const [question1, setQuestion1] = useState<string>("");
   const [question2, setQuestion2] = useState<string>("");
@@ -197,40 +203,58 @@ const Chat = ({ navigation }: any) => {
   };
 
   useEffect(() => {
+    if (focus) {
+      const fetchData = async () => {
+        try {
+          const response = await authAxios.get("/patient/getPatientByUserId");
+          if (response.data.message === "success") {
+            setUserInfo(response.data.data);
+          } else {
+            console.log("No data", response.data.message);
+          }
+        } catch (error) {
+          console.log("Error: ", error);
+        }
+      };
+      fetchData();
+    }
+  }, [focus]);
+
+  useEffect(() => {
     if (checkInput()) {
       if (currentStep === 60) {
-        setIsLoading(true);
-        // loop this loading for 4 seconds
-        setTimeout(() => {
-          console.log("Data: ", { question1, question2, question3, question4 });
+        // setIsLoading(true);
+        const data = {
+          question1: question1,
+          question2: question2,
+          question3: question3,
+          question4: question4,
+          question5: question5,
+          question6: question6,
+          question7: question7,
+          patientHistory: userInfo,
+        };
+        console.log(data);
 
-          navigation.navigate("Result", {
-            data: {
-              question1,
-              question2,
-              question3,
-              question4,
-              question5,
-              question6,
-              question7,
-            },
-          });
-          clearData();
-          setIsLoading(false);
-        }, 4000);
+        // setTimeout(() => {
+        //   console.log("Data: ", { question1, question2, question3, question4 });
+
+        //   navigation.navigate("Result", {
+        //     data: {
+        //       question1,
+        //       question2,
+        //       question3,
+        //       question4,
+        //       question5,
+        //       question6,
+        //       question7,
+        //     },
+        //   });
+        //   clearData();
+        //   setIsLoading(false);
+        // }, 4000);
         return;
       } else {
-        // if (
-        //   (currentStep === 0 && question1 !== "") ||
-        //   (currentStep === 10 && question2 !== "") ||
-        //   (currentStep === 20 && question3 !== "") ||
-        //   (currentStep === 30 && question4 !== "") ||
-        //   (currentStep === 40 && question5 !== "") ||
-        //   (currentStep === 50 && question6 !== "") ||
-        //   (currentStep === 60 && question7 !== "")
-        // ) {
-        //   handleNext();
-        // }
         handleNext();
       }
     }

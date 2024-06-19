@@ -25,10 +25,13 @@ import { formatNumber } from "../../../utils/NumberFormatter";
 import { AxiosContext } from "../../../context/AxiosContext";
 import { useIsFocused } from "@react-navigation/native";
 import CustomToast from "../../../components/CustomToast";
+import * as SecureStore from "expo-secure-store";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 interface Package {
   _id: string;
   packageName: string;
+  description: string;
   price: number;
   features: string[];
 }
@@ -68,22 +71,17 @@ const Package = ({ navigation }: any) => {
     try {
       console.log("Redirect uri", redirectUri);
       console.log(calculateTotalPrice());
+      const total = calculateTotalPrice();
 
       const url = await authAxios.post("/payment/PayOS", {
         package_id: selectedPackage?._id,
-        amount: calculateTotalPrice(),
+        amount: total,
         redirectUri: redirectUri,
       });
 
       if (url.data.message === "success") {
         WebBrowser.openBrowserAsync(url.data.data.checkoutUrl);
-        // const result = await WebBrowser.openBrowserAsync(
-        //   url.data.data.checkoutUrl
-        // );
-        // if (result.type === "cancel") {
-        //   console.log("User cancelled the payment");
-        // }
-        onClose();
+        // onClose();
       }
     } catch (error: any) {
       console.log("Error purchase package", error);
@@ -107,12 +105,9 @@ const Package = ({ navigation }: any) => {
     }
   }, [focus]);
   useEffect(() => {
-    const handleOpenURL = (event: any) => {
-      console.log("App was opened with URL: " + event.url);
+    const handleOpenURL = async (event: any) => {
       // Perform some action here
       const { path, queryParams } = Linking.parse(event.url);
-      console.log("Path", path);
-      console.log("Query params", queryParams);
       if (queryParams?.status === "CANCELLED") {
         onClose();
         toast.show({
@@ -120,6 +115,19 @@ const Package = ({ navigation }: any) => {
             <CustomToast
               message={"Thanh toán đã bị hủy"}
               state={"error"}
+              onClose={() => {
+                toast.closeAll();
+              }}
+            />
+          ),
+        });
+      } else if (queryParams?.status === "PAID") {
+        onClose();
+        toast.show({
+          render: () => (
+            <CustomToast
+              message={"Thanh toán thành công"}
+              state={"success"}
               onClose={() => {
                 toast.closeAll();
               }}

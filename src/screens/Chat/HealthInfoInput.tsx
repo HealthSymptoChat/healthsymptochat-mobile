@@ -24,6 +24,7 @@ import WaveHeader from "../../components/WaveHeader";
 import CustomToast from "../../components/CustomToast";
 import { AxiosContext } from "../../context/AxiosContext";
 import { CommonActions } from "@react-navigation/native";
+import { useBackHandler } from "@react-native-community/hooks";
 
 const { width, height } = Dimensions.get("window");
 
@@ -37,6 +38,7 @@ const HealthInfoInput = ({ navigation }: any) => {
   // info
   const [address, setAddress] = useState<string>("");
   const [job, setJob] = useState<string>("");
+  const [gender, setGender] = useState<string>("");
   const [disease, setDisease] = useState<boolean>();
   const [treatment, setTreatment] = useState<string>("");
   const [surgery, setSurgery] = useState<boolean>();
@@ -69,8 +71,12 @@ const HealthInfoInput = ({ navigation }: any) => {
     });
   };
 
-  // const handleEscape = () => {
-  //   navigation.addListener("beforeRemove", (e: any) => {
+  // useEffect(() => {
+  //   const unsubscribe = navigation.addListener("beforeRemove", (e: any) => {
+  //     if (currentStep === 0) {
+  //       return;
+  //     }
+  //     e.preventDefault();
   //     Alert.alert(
   //       "Thoát khỏi thông tin sức khỏe",
   //       "Dữ liệu hiện tại của bạn sẽ không được lưu lại",
@@ -88,34 +94,9 @@ const HealthInfoInput = ({ navigation }: any) => {
   //       ]
   //     );
   //   });
-  // };
 
-  useEffect(() => {
-    const unsubscribe = navigation.addListener("beforeRemove", (e: any) => {
-      if (currentStep === 0) {
-        return;
-      }
-      e.preventDefault();
-      Alert.alert(
-        "Thoát khỏi thông tin sức khỏe",
-        "Dữ liệu hiện tại của bạn sẽ không được lưu lại",
-        [
-          {
-            text: "Hủy",
-            style: "cancel",
-            onPress: () => {},
-          },
-          {
-            text: "Thoát",
-            style: "destructive",
-            onPress: () => navigation.dispatch(e.data.action),
-          },
-        ]
-      );
-    });
-
-    return unsubscribe;
-  }, [navigation, currentStep]);
+  //   return unsubscribe;
+  // }, [navigation, currentStep]);
 
   const checkInput = (): boolean | undefined => {
     switch (currentStep) {
@@ -136,10 +117,19 @@ const HealthInfoInput = ({ navigation }: any) => {
     }
   };
 
+  const returnToHome = () => {
+    navigation.reset({
+      index: 0,
+      routes: [{ name: "TabBar" }],
+    });
+    // navigation.navigate("TabBar");
+  };
+
   const handleSuccess = async () => {
     console.log({
       address,
       job,
+      gender,
       disease,
       treatment,
       surgery,
@@ -154,6 +144,7 @@ const HealthInfoInput = ({ navigation }: any) => {
     const response = await authAxios.post("/patient/addPatient", {
       address: address,
       job: job,
+      gender: gender,
       past_diseases: disease ? "Có" : "Không",
       past_disease_treatment: treatment,
       had_surgery: surgery ? "Có" : "Không",
@@ -182,7 +173,7 @@ const HealthInfoInput = ({ navigation }: any) => {
           />
         ),
       });
-      navigation.navigate("Chat", { canGoBack: false });
+      navigation.navigate("TabBar");
     } else {
       console.log(response.data);
       toast.show({
@@ -213,6 +204,31 @@ const HealthInfoInput = ({ navigation }: any) => {
       outputRange: [0, 1, 0],
     }),
   };
+
+  useBackHandler(() => {
+    if (currentStep === 0) {
+      return false;
+    }
+    Alert.alert(
+      "Thoát khỏi thông tin sức khỏe",
+      "Dữ liệu hiện tại của bạn sẽ không được lưu lại",
+      [
+        {
+          text: "Hủy",
+          style: "cancel",
+          onPress: () => {},
+        },
+        {
+          text: "Thoát",
+          style: "destructive",
+          onPress: () => {
+            navigation.navigate("TabBar");
+          },
+        },
+      ]
+    );
+    return true;
+  });
 
   return (
     <View
@@ -347,6 +363,39 @@ const HealthInfoInput = ({ navigation }: any) => {
                   }
                   onChangeText={(text) => setJob(text)}
                 />
+                <Text marginY={5} fontSize={"lg"} textAlign={"center"}>
+                  Giới tính
+                </Text>
+                <Radio.Group
+                  name="radioGroup"
+                  value={gender || ""}
+                  _radio={{
+                    borderColor: Colors.primaryMintDark,
+                    _checked: {
+                      _icon: {
+                        color: Colors.primaryMintDark,
+                        borderRadius: "full",
+                      },
+                      borderColor: Colors.primaryMintDark,
+                    },
+                  }}
+                  onChange={(nextValue) => setGender(nextValue)}
+                >
+                  <View
+                    width={"40%"}
+                    display={"flex"}
+                    flexDirection={"row"}
+                    justifyContent={"space-between"}
+                    alignSelf={"center"}
+                  >
+                    <Radio value="Nam" size="md" my={1} marginRight={1}>
+                      Nam
+                    </Radio>
+                    <Radio value="Nữ" size="md" my={1} marginLeft={1}>
+                      Nữ
+                    </Radio>
+                  </View>
+                </Radio.Group>
               </Animated.View>
             )}
             {currentStep === 10 && (
@@ -850,6 +899,7 @@ const HealthInfoInput = ({ navigation }: any) => {
               alignSelf={"flex-end"}
               rounded={"full"}
               bg={Colors.primaryMintDark}
+              isDisabled={!checkInput()}
               rightIcon={
                 <Icon
                   as={AntDesign}

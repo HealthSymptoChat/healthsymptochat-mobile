@@ -25,7 +25,6 @@ import {
 import Chat from "./Chat/Chat";
 import { AxiosContext } from "../context/AxiosContext";
 import Result from "./Chat/Result";
-import HealthInfo from "./Profiles/HealthInfo/HealthInfo";
 import HealthInfoInput from "./Chat/HealthInfoInput";
 import Information from "./Information/Information";
 import AssessmentDetail from "./Profiles/AssessmentHistory/AssessmentDetail";
@@ -204,16 +203,6 @@ const Navigation = () => {
           <Stack.Screen
             name="AssessmentDetail"
             component={AssessmentDetail}
-            options={{
-              title: "",
-              headerTransparent: true,
-              headerTintColor:
-                colorMode === "dark" ? Colors.white : Colors.black,
-            }}
-          />
-          <Stack.Screen
-            name="HealthInfo"
-            component={HealthInfo}
             options={{
               title: "",
               headerTransparent: true,
