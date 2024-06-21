@@ -1,6 +1,4 @@
-interface UserAssessmentProps {
-  _id: string;
-  user: any;
+interface DiagnosisProps {
   disease: string;
   description: string;
   treatment: string[];
@@ -8,7 +6,4 @@ interface UserAssessmentProps {
     name: string;
     description: string;
   }[];
-  createdDate: string;
 }
-
-export default UserAssessmentProps;

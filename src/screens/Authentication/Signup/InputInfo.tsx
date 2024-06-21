@@ -82,17 +82,7 @@ const InputInfo = ({ route }: any) => {
 
   const handleRegisterUser = async () => {
     try {
-      if (
-        !(
-          username &&
-          gender &&
-          dob &&
-          password &&
-          confirmPassword &&
-          password &&
-          confirmPassword
-        )
-      ) {
+      if (!(username && password && confirmPassword)) {
         toast.show({
           render: () => (
             <CustomToast
@@ -121,9 +111,6 @@ const InputInfo = ({ route }: any) => {
         firstName,
         lastName,
         username,
-        gender,
-        dob,
-        phone,
         password,
         confirmPassword
       );
@@ -132,7 +119,7 @@ const InputInfo = ({ route }: any) => {
         firstName: firstName,
         lastName: lastName,
         username: username,
-        gender: gender,
+        // gender: gender,
         // dob: dob,
         password: password,
       });
@@ -229,10 +216,10 @@ const InputInfo = ({ route }: any) => {
           isRequired={true}
           onChange={(e) => setUsername(e.nativeEvent.text)}
         />
-        <Text fontSize="md" style={{ margin: 10 }}>
+        {/* <Text fontSize="md" style={{ margin: 10 }}>
           Giới tính
-        </Text>
-        <Radio.Group
+        </Text> */}
+        {/* <Radio.Group
           name="radioGroup"
           value={gender}
           _radio={{
@@ -263,8 +250,8 @@ const InputInfo = ({ route }: any) => {
               Nữ
             </Radio>
           </View>
-        </Radio.Group>
-        <Text fontSize="md" style={{ margin: 10 }}>
+        </Radio.Group> */}
+        {/* <Text fontSize="md" style={{ margin: 10 }}>
           Ngày sinh
         </Text>
         <Input
@@ -298,7 +285,7 @@ const InputInfo = ({ route }: any) => {
           onDismiss={onDismissSingle}
           date={dob}
           onConfirm={onConfirmSingle}
-        />
+        /> */}
 
         <Text fontSize="md" style={{ margin: 10 }}>
           Mật khẩu
@@ -345,8 +332,6 @@ const InputInfo = ({ route }: any) => {
             !firstName ||
             !lastName ||
             !username ||
-            !gender ||
-            !dob ||
             !password ||
             !confirmPassword
           }

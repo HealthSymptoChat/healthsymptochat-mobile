@@ -252,15 +252,6 @@ const Login = ({ navigation }: any) => {
           onChange={(e) => setPassword(e.nativeEvent.text)}
         />
         <Button
-          variant="link"
-          style={{ marginTop: 10, width: "40%", alignSelf: "center" }}
-          onPress={() => navigation.navigate("ForgetPassword")}
-          _text={{ color: Colors.primaryMintDark }}
-          _pressed={{ opacity: 0.7 }}
-        >
-          Quên mật khẩu?
-        </Button>
-        <Button
           rounded="full"
           bg={Colors.primaryMintDark}
           style={{ margin: 20 }}
@@ -287,7 +278,7 @@ const Login = ({ navigation }: any) => {
               <Text style={{ marginLeft: 5 }}>Đăng nhập bằng Google</Text>
             </View>
           </Button>
-          <Button
+          {/* <Button
             rounded="full"
             variant="outline"
             _text={{ color: Colors.primaryMintDark }}
@@ -301,7 +292,7 @@ const Login = ({ navigation }: any) => {
               />
               <Text style={{ marginLeft: 5 }}>Đăng nhập bằng Facebook</Text>
             </View>
-          </Button>
+          </Button> */}
         </View>
         <Button
           rounded="full"

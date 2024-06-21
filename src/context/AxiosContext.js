@@ -11,8 +11,9 @@ const { Provider } = AxiosContext;
 const AxiosProvider = ({ children }) => {
   const authContext = useContext(AuthContext);
 
+  const baseURL = "https://hsc-sever.onrender.com/api/v1";
   // const baseURL = "https://hsc-sever.vercel.app/api/v1";
-  const baseURL = "http://10.0.2.2:5000/api/v1";
+  // const baseURL = "http://10.0.2.2:5000/api/v1";
 
   const authAxios = axios.create({
     baseURL: baseURL,
@@ -89,11 +90,13 @@ const AxiosProvider = ({ children }) => {
     },
     async (error) => {
       const originalRequest = error.config;
+      console.log("error", error.response.status);
       if (error.response.status === 403 && !originalRequest._retry) {
         originalRequest._retry = true;
         const refreshToken = authContext.authState.refreshToken;
         if (refreshToken) {
           try {
+            console.log("refreshing token");
             const response = await axios.post(baseURL + "/auth/token", {
               refreshToken,
             });

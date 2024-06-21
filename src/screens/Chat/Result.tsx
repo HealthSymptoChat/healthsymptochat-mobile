@@ -10,17 +10,21 @@ import {
   Center,
   Modal,
   Button,
+  useToast,
 } from "native-base";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Colors } from "../../theme/Theme";
 import { AntDesign, FontAwesome6, FontAwesome5 } from "@expo/vector-icons";
 import { useBackHandler } from "@react-native-community/hooks";
 import { useIsFocused } from "@react-navigation/native";
 import { Alert } from "react-native";
+import { AxiosContext } from "../../context/AxiosContext";
+import CustomToast from "../../components/CustomToast";
 
 const Result = ({ navigation, route }: any) => {
-  const [isOpened, setIsOpened] = useState<boolean>(false);
-  const { data } = route.params;
+  const data: DiagnosisProps = route.params.data;
+  const { authAxios }: any = useContext(AxiosContext);
+  const toast = useToast();
 
   const returnToChat = () => {
     navigation.navigate("Chat");
@@ -38,10 +42,40 @@ const Result = ({ navigation, route }: any) => {
     returnToChat();
   };
 
-  const handleSaveResult = () => {
-    console.log(data);
-
-    returnToHome();
+  const handleSaveResult = async () => {
+    try {
+      console.log(data);
+      const response = await authAxios.post("/diagnose", data);
+      if (response.data.message === "success") {
+        toast.show({
+          render: () => (
+            <CustomToast
+              message="Lưu kết quả thành công!"
+              state="success"
+              onClose={() => {
+                toast.closeAll();
+              }}
+            />
+          ),
+        });
+      } else {
+        console.log("Error", response.data.message);
+        toast.show({
+          render: () => (
+            <CustomToast
+              message="Lưu kết quả không thành công!"
+              state="error"
+              onClose={() => {
+                toast.closeAll();
+              }}
+            />
+          ),
+        });
+      }
+      returnToHome();
+    } catch (error) {
+      console.log("Error", error);
+    }
   };
 
   useBackHandler(() => {
@@ -99,188 +133,90 @@ const Result = ({ navigation, route }: any) => {
         >
           Kết quả
         </Text>
-
-        <Pressable onPress={() => setIsOpened(!isOpened)}>
-          {({ isPressed }) => {
-            return (
-              <View
-                style={{
-                  transform: [{ scale: isPressed ? 0.95 : 1 }],
-                }}
-                display={"flex"}
-                flexDirection={"column"}
-                bg={Colors.white}
-                borderStyle={"solid"}
-                borderRadius={"3xl"}
-                shadow={6}
-                padding={5}
-              >
-                <Text fontSize={22} textAlign={"center"} fontWeight={"bold"}>
-                  Cảm cúm
-                </Text>
-                <Text fontSize={16} textAlign={"center"} marginTop={5}>
-                  Bạn có triệu chứng cảm cúm, bạn cần nghỉ ngơi và uống nhiều
-                  nước
-                </Text>
-              </View>
-            );
-          }}
-        </Pressable>
-        <Modal isOpen={isOpened} size={"md"} onClose={() => setIsOpened(false)}>
-          <Modal.Content maxWidth="400px">
-            <Modal.CloseButton />
-            <Modal.Header>
-              <Text fontSize={20} fontWeight={"bold"}>
-                Cảm cúm
-              </Text>
-            </Modal.Header>
-            <Modal.Body>
-              <Text>
-                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quos
-                blanditiis tenetur
-              </Text>
-            </Modal.Body>
-            {/* <Modal.Footer>
-              <Button.Group space={2}>
-                <Button
-                  variant="ghost"
-                  colorScheme="blueGray"
-                  onPress={() => {
-                    setShowModal(false);
-                  }}
-                >
-                  Cancel
-                </Button>
-            </Modal.Footer> */}
-          </Modal.Content>
-        </Modal>
+        <View
+          display={"flex"}
+          flexDirection={"column"}
+          bg={Colors.white}
+          borderStyle={"solid"}
+          borderRadius={"3xl"}
+          shadow={6}
+          padding={5}
+        >
+          <Text fontSize={22} textAlign={"center"} fontWeight={"bold"}>
+            {data.disease}
+          </Text>
+          <Text fontSize={16} textAlign={"center"} marginTop={5}>
+            {data.description}
+          </Text>
+        </View>
         <View marginTop={10}>
           <Text fontSize={20} fontWeight="bold">
-            Các khả năng khác
+            Đề xuất điều trị
           </Text>
-          <View
-            display={"flex"}
-            flexDirection={"row"}
-            justifyContent={"center"}
-            flexWrap={"wrap"}
-            marginTop={5}
-          >
-            <View
-              width={"95%"}
-              height={100}
-              display={"flex"}
-              flexDirection={"row"}
-              alignItems={"center"}
-              bg={Colors.white}
-              borderStyle={"solid"}
-              borderRadius={"3xl"}
-              shadow={2}
-            >
-              <Image
-                source={require("../../../assets/medicine.png")}
-                resizeMode="cover"
-                alt="doctor"
-                width={"30%"}
-                height={"100%"}
-                rounded={"3xl"}
-              />
+          {data.treatment?.length > 0 &&
+            data.treatment?.map((treatment, index) => (
               <View
-                width={"70%"}
+                key={index}
+                marginTop={5}
                 display={"flex"}
                 flexDirection={"column"}
-                padding={5}
               >
-                <Text fontSize={16} textAlign={"center"} fontWeight={"bold"}>
-                  Cảm cúm
-                </Text>
-                <Text marginTop={5} color={Colors.primaryMintDark}>
-                  Bạn cần nghỉ ngơi và uống nhiều nước
-                </Text>
+                <View
+                  display={"flex"}
+                  flexDirection={"row"}
+                  alignItems={"center"}
+                >
+                  <Icon
+                    as={FontAwesome6}
+                    name={"check-circle"}
+                    size={7}
+                    color={Colors.primaryMintDark}
+                    marginRight={2}
+                  />
+                  <Text width={"90%"} fontSize={16} fontWeight={"semibold"}>
+                    {treatment}
+                  </Text>
+                </View>
               </View>
-            </View>
-          </View>
-          <View
-            display={"flex"}
-            flexDirection={"row"}
-            justifyContent={"center"}
-            flexWrap={"wrap"}
-            marginTop={5}
-          >
-            <View
-              width={"95%"}
-              height={100}
-              display={"flex"}
-              flexDirection={"row"}
-              alignItems={"center"}
-              bg={Colors.white}
-              borderStyle={"solid"}
-              borderRadius={"3xl"}
-              shadow={2}
-            >
-              <Image
-                source={require("../../../assets/medicine.png")}
-                resizeMode="cover"
-                alt="doctor"
-                width={"30%"}
-                height={"100%"}
-                rounded={"3xl"}
-              />
+            ))}
+        </View>
+        <View marginTop={10}>
+          <Text fontSize={20} fontWeight="bold">
+            Các trường hợp khác
+          </Text>
+          {data.otherDiseases?.length > 0 &&
+            data.otherDiseases?.map((disease, index) => (
               <View
-                width={"70%"}
+                key={index}
                 display={"flex"}
-                flexDirection={"column"}
-                padding={5}
+                flexDirection={"row"}
+                justifyContent={"center"}
+                flexWrap={"wrap"}
+                marginTop={5}
               >
-                <Text fontSize={16} textAlign={"center"} fontWeight={"bold"}>
-                  Cảm cúm
-                </Text>
-                <Text marginTop={5} color={Colors.primaryMintDark}>
-                  Bạn cần nghỉ ngơi và uống nhiều nước
-                </Text>
+                <View
+                  width={"95%"}
+                  // height={100}
+                  display={"flex"}
+                  flexDirection={"column"}
+                  alignItems={"center"}
+                  bg={Colors.white}
+                  borderStyle={"solid"}
+                  borderRadius={"3xl"}
+                  shadow={2}
+                  padding={5}
+                >
+                  <Text
+                    fontSize={16}
+                    textAlign={"center"}
+                    fontWeight={"semibold"}
+                  >
+                    {disease.name}
+                  </Text>
+                  <Text marginTop={5}>{disease.description}</Text>
+                </View>
               </View>
-            </View>
-          </View>
-          <View
-            display={"flex"}
-            flexDirection={"row"}
-            justifyContent={"center"}
-            flexWrap={"wrap"}
-            marginTop={5}
-          >
-            <View
-              width={"95%"}
-              height={100}
-              display={"flex"}
-              flexDirection={"row"}
-              alignItems={"center"}
-              bg={Colors.white}
-              borderStyle={"solid"}
-              borderRadius={"3xl"}
-              shadow={2}
-            >
-              <Image
-                source={require("../../../assets/medicine.png")}
-                resizeMode="cover"
-                alt="doctor"
-                width={"30%"}
-                height={"100%"}
-                rounded={"3xl"}
-              />
-              <View
-                width={"70%"}
-                display={"flex"}
-                flexDirection={"column"}
-                padding={5}
-              >
-                <Text fontSize={16} textAlign={"center"} fontWeight={"bold"}>
-                  Cảm cúm
-                </Text>
-                <Text marginTop={5} color={Colors.primaryMintDark}>
-                  Bạn cần nghỉ ngơi và uống nhiều nước
-                </Text>
-              </View>
-            </View>
-          </View>
+            ))}
         </View>
         <View
           marginTop={10}

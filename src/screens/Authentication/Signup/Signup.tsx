@@ -132,14 +132,14 @@ const Signup = ({ navigation }: any) => {
         <Button
           rounded="full"
           bg={Colors.primaryMintDark}
-          style={{ margin: 20 }}
+          style={{ margin: 20, marginTop: 40 }}
           onPress={handleSignup}
           _pressed={{ opacity: 0.7 }}
         >
           Đăng ký
         </Button>
 
-        <View style={styles.buttonGroup}>
+        {/* <View style={styles.buttonGroup}>
           <Button
             rounded="full"
             variant="outline"
@@ -170,7 +170,7 @@ const Signup = ({ navigation }: any) => {
               <Text style={{ marginLeft: 5 }}>Đăng ký bằng Facebook</Text>
             </View>
           </Button>
-        </View>
+        </View> */}
         <Button
           rounded="full"
           variant="link"

@@ -15,31 +15,31 @@ const data = [
   {
     id: 1,
     title: "Chăm sóc sức khỏe mùa mưa",
-    date: "2021-09-01",
+    date: "2024-06-01",
     description:
       "Mùa mưa là thời điểm các bệnh như cảm cúm, viêm họng, sốt xuất hiện nhiều nhất. Để phòng tránh, bạn cần chú ý đến cách chăm sóc sức khỏe mùa mưa.",
     image: require("../../../assets/rain.png"),
   },
   {
     id: 2,
-    title: "Chăm sóc sức khỏe mùa khô",
-    date: "2021-09-01",
+    title: "Cảnh báo nắng nóng 'Kỷ Lục' mùa hè 2024",
+    date: "2024-04-12",
     description:
       "Khi thời tiết khô, cơ thể dễ bị mất nước, gây ra nhiều vấn đề về sức khỏe. Để chăm sóc sức khỏe mùa khô, bạn cần chú ý đến việc uống nhiều nước, bổ sung vitamin và khoáng chất.",
     image: require("../../../assets/summer.png"),
   },
   {
     id: 3,
-    title: "Chăm sóc sức khỏe mùa nắng",
-    date: "2021-09-01",
+    title: "Cảnh báo gia tăng bệnh da liễu vào mùa hè",
+    date: "2024-03-01",
     description:
-      "Mùa nắng là thời điểm cơ thể dễ bị tổn thương do tác động của tia UV. Để chăm sóc sức khỏe mùa nắng, bạn cần chú ý đến việc bảo vệ da, đeo kính râm, đội nón, sử dụng kem chống nắng.",
+      "Mùa hè là thời điểm cơ thể dễ bị nổi mụn, ngứa ngáy, viêm da. Để chăm sóc sức khỏe mùa hè, bạn cần chú ý ăn uống cân đối, giữ ấm cơ thể, tăng cường vận động.",
     image: require("../../../assets/fall.png"),
   },
   {
     id: 4,
     title: "Chăm sóc sức khỏe mùa đông",
-    date: "2021-09-01",
+    date: "2023-12-01",
     description:
       "Mùa đông là thời điểm cơ thể dễ bị cảm lạnh, cảm cúm, viêm họng. Để chăm sóc sức khỏe mùa đông, bạn cần chú ý ăn uống cân đối, giữ ấm cơ thể, tăng cường vận động.",
     image: require("../../../assets/winter.png"),
@@ -68,8 +68,8 @@ const Information = () => {
       }}
       style={{ height: "100%", width: "100%" }}
     >
-      <Heading size="md" marginBottom={10}>
-        Thông báo
+      <Heading size="md" marginBottom={10} marginLeft={5}>
+        Thông tin
       </Heading>
       <FlatList
         data={data}

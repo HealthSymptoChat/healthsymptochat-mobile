@@ -1,8 +1,16 @@
-import { View, Text, Divider, Icon, Heading, Pressable } from "native-base";
+import {
+  View,
+  Text,
+  Divider,
+  Icon,
+  Heading,
+  Pressable,
+  Image,
+} from "native-base";
 import React, { useContext, useEffect, useState } from "react";
 import { Colors } from "../../../theme/Theme";
 import { Dimensions } from "react-native";
-import { Octicons, FontAwesome6 } from "@expo/vector-icons";
+import { Octicons, FontAwesome6, AntDesign } from "@expo/vector-icons";
 import { AxiosContext } from "../../../context/AxiosContext";
 import { useIsFocused } from "@react-navigation/native";
 import { ExtractTime, FormatDate } from "../../../utils/DateFormatter";
@@ -57,115 +65,134 @@ const AssessmentHistory = ({ navigation }: any) => {
             alignItems={"flex-end"}
           >
             {/* Timeline list */}
-            {userAssessments.map((assessment: UserAssessmentProps, index) => (
-              <View
-                key={index}
-                w="full"
-                marginY={5}
-                display={"flex"}
-                flexDirection={"row"}
-                alignItems={"flex-start"}
-              >
-                <Text
-                  width={"10"}
-                  fontSize={"md"}
-                  fontWeight={"bold"}
-                  marginRight={"9"}
-                  marginTop={2}
+            {userAssessments
+              .filter(
+                (assessment: UserAssessmentProps) =>
+                  assessment.createdDate !== null
+              )
+              .sort(
+                (a, b) =>
+                  new Date(b.createdDate).getTime() -
+                  new Date(a.createdDate).getTime()
+              )
+              .map((assessment: UserAssessmentProps, index) => (
+                <View
+                  key={index}
+                  w="full"
+                  marginY={5}
+                  display={"flex"}
+                  flexDirection={"row"}
+                  alignItems={"flex-start"}
                 >
-                  {FormatDate(assessment.createdDate.toString())}
-                </Text>
-                <Icon
-                  as={Octicons}
-                  name={"dot-fill"}
-                  size={12}
-                  color={Colors.primaryMintDark}
-                />
-                <Pressable
-                  w={"2/3"}
-                  onPress={() =>
-                    navigation.navigate("AssessmentDetail", assessment)
-                  }
-                >
-                  {({ isPressed }) => {
-                    return (
-                      <View
-                        // _light={{
-                        //   bg: "dark.100",
-                        // }}
-                        // _dark={{
-                        //   bg: "light.50",
-                        // }}
-                        bg={isPressed ? Colors.grey : Colors.white}
-                        style={{
-                          transform: [
-                            {
-                              scale: isPressed ? 0.96 : 1,
-                            },
-                          ],
-                        }}
-                        padding={5}
-                        shadow={6}
-                        borderRadius={20}
-                      >
-                        <Heading
-                          _dark={{
-                            color: "dark.100",
-                          }}
-                          //   _light={{
-                          //     color: "light.50",
-                          //   }}
-                          fontSize={"lg"}
-                          fontWeight={"bold"}
-                        >
-                          {assessment.disease}
-                        </Heading>
+                  <Text
+                    width={"10"}
+                    fontSize={"md"}
+                    fontWeight={"bold"}
+                    marginRight={"9"}
+                    marginTop={2}
+                  >
+                    {FormatDate(assessment.createdDate.toString())}
+                  </Text>
+                  <Icon
+                    as={Octicons}
+                    name={"dot-fill"}
+                    size={12}
+                    color={Colors.primaryMintDark}
+                  />
+                  <Pressable
+                    w={"2/3"}
+                    onPress={() =>
+                      navigation.navigate("AssessmentDetail", assessment)
+                    }
+                  >
+                    {({ isPressed }) => {
+                      return (
                         <View
-                          display={"flex"}
-                          flexDirection={"row"}
-                          alignItems={"center"}
+                          // _light={{
+                          //   bg: "dark.100",
+                          // }}
+                          // _dark={{
+                          //   bg: "light.50",
+                          // }}
+                          bg={isPressed ? Colors.grey : Colors.white}
+                          style={{
+                            transform: [
+                              {
+                                scale: isPressed ? 0.96 : 1,
+                              },
+                            ],
+                          }}
+                          padding={5}
+                          shadow={6}
+                          borderRadius={20}
                         >
-                          <Icon
+                          <Heading
                             _dark={{
                               color: "dark.100",
                             }}
-                            // _light={{
-                            //   color: "light.50",
-                            // }}
-                            as={FontAwesome6}
-                            name={"clock"}
-                            size={5}
-                          />
-                          <Text
-                            _dark={{
-                              color: "dark.100",
-                            }}
-                            // _light={{
-                            //   color: "light.50",
-                            // }}
-                            marginLeft={2}
-                            fontSize={"sm"}
+                            //   _light={{
+                            //     color: "light.50",
+                            //   }}
+                            fontSize={"lg"}
+                            fontWeight={"bold"}
                           >
-                            {ExtractTime(assessment.createdDate.toString())}
-                          </Text>
+                            {assessment.disease}
+                          </Heading>
+                          <View
+                            display={"flex"}
+                            flexDirection={"row"}
+                            alignItems={"center"}
+                          >
+                            <Icon
+                              _dark={{
+                                color: "dark.100",
+                              }}
+                              // _light={{
+                              //   color: "light.50",
+                              // }}
+                              as={FontAwesome6}
+                              name={"clock"}
+                              size={5}
+                            />
+                            <Text
+                              _dark={{
+                                color: "dark.100",
+                              }}
+                              // _light={{
+                              //   color: "light.50",
+                              // }}
+                              marginLeft={2}
+                              fontSize={"sm"}
+                            >
+                              {ExtractTime(assessment.createdDate.toString())}
+                            </Text>
+                          </View>
                         </View>
-                      </View>
-                    );
-                  }}
-                </Pressable>
-              </View>
-            ))}
+                      );
+                    }}
+                  </Pressable>
+                </View>
+              ))}
           </View>
         </View>
       ) : (
-        <View style={{ height: "100%", width: "100%", padding: 10 }}>
-          <Text
-            fontSize={"md"}
-            fontWeight={"bold"}
-            marginRight={"8"}
-            marginTop={2}
-            alignSelf={"center"}
-          >
+        <View
+          style={{
+            width: "100%",
+            height: "100%",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Icon
+            as={AntDesign}
+            name="exclamationcircle"
+            size={24}
+            color={"orange.600"}
+          />
+          <Text fontSize="lg" textAlign="center">
             Không có dữ liệu
           </Text>
         </View>

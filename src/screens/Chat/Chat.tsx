@@ -12,6 +12,7 @@ import {
   ScrollView,
   Spinner,
 } from "native-base";
+import axios from "axios";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { Colors } from "../../theme/Theme";
 import { AntDesign, FontAwesome5 } from "@expo/vector-icons";
@@ -29,18 +30,18 @@ const Chat = ({ navigation }: any) => {
   const focus = useIsFocused();
   const [currentStep, setCurrentStep] = useState<number>(0);
   const slideAnimation = new Animated.Value(0);
-  const cancelRef = useRef(null);
   const authContext: any = useContext(AuthContext);
   const { authAxios }: any = useContext(AxiosContext);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isSubmit, setIsSubmit] = useState<boolean>(false);
   const [step, setStep] = useState<number>(0);
   const stepSize = 10;
   const [userInfo, setUserInfo] = useState<UserInfoProps>();
   // answer data
   const [question1, setQuestion1] = useState<string>("");
-  const [question2, setQuestion2] = useState<string>("");
+  const [question2, setQuestion2] = useState<string[]>([]);
   const [question3, setQuestion3] = useState<string>("");
-  const [question4, setQuestion4] = useState<string>("");
+  const [question4, setQuestion4] = useState<string[]>([]);
   const [question5, setQuestion5] = useState<string>("");
   const [question6, setQuestion6] = useState<string>("");
   const [question7, setQuestion7] = useState<string>("");
@@ -132,23 +133,10 @@ const Chat = ({ navigation }: any) => {
     switch (currentStep) {
       case 0:
         return question1 !== "";
-      case 10:
-        if (question2 !== "") {
-          if (
-            question2 !== "Sốt" &&
-            question2 !== "Ho" &&
-            question2 !== "Đau họng" &&
-            question2 !== "Chảy nước mũi" &&
-            question2 !== "Nghẹt mũi" &&
-            question2 !== "Đau đầu" &&
-            question2 !== "Đau cơ" &&
-            question2 !== "Mệt mỏi" &&
-            question2 !== "Mất vị giác hoặc khứu giác"
-          ) {
-            return question2Other !== "";
-          }
-          return true;
-        }
+      // case 10:
+      //   if (question2.length > 0 || question2Other !== "") {
+      //     return true;
+      //   }
       case 20:
         if (question3 !== "") {
           if (
@@ -161,21 +149,21 @@ const Chat = ({ navigation }: any) => {
           }
           return true;
         }
-      case 30:
-        if (question4 !== "") {
-          if (
-            question4 !== "Khó ngủ" &&
-            question4 !== "Mất tập trung" &&
-            question4 !== "Giảm cân" &&
-            question4 !== "Yếu ớt" &&
-            question4 !== "Khó chịu" &&
-            question4 !== "Lo lắng" &&
-            question4 !== "Mất cảm giác ngon miệng"
-          ) {
-            return question4Other !== "";
-          }
-          return true;
-        }
+      // case 30:
+      //   if (question4 !== "") {
+      //     if (
+      //       question4 !== "Khó ngủ" &&
+      //       question4 !== "Mất tập trung" &&
+      //       question4 !== "Giảm cân" &&
+      //       question4 !== "Yếu ớt" &&
+      //       question4 !== "Khó chịu" &&
+      //       question4 !== "Lo lắng" &&
+      //       question4 !== "Mất cảm giác ngon miệng"
+      //     ) {
+      //       return question4Other !== "";
+      //     }
+      //     return true;
+      //   }
       case 40:
         return question5 !== "";
       case 50:
@@ -189,9 +177,9 @@ const Chat = ({ navigation }: any) => {
 
   const clearData = () => {
     setQuestion1("");
-    setQuestion2("");
+    setQuestion2([]);
     setQuestion3("");
-    setQuestion4("");
+    setQuestion4([]);
     setQuestion5("");
     setQuestion6("");
     setQuestion7("");
@@ -200,6 +188,92 @@ const Chat = ({ navigation }: any) => {
     setQuestion4Other("");
     setCurrentStep(0);
     setStep(0);
+    setQuestion2Other("");
+    setQuestion3Other("");
+  };
+
+  const handleInputQuestion2 = (data: string): void => {
+    if (question2.find((item) => item === data)) {
+      setQuestion2(question2.filter((item) => item !== data));
+    } else {
+      setQuestion2([...question2, data]);
+    }
+  };
+
+  const handleInputQuestion4 = (data: string): void => {
+    if (question4.find((item) => item === data)) {
+      setQuestion4(question4.filter((item) => item !== data));
+    } else {
+      setQuestion4([...question4, data]);
+    }
+  };
+
+  const isQuestion2Filled =
+    currentStep === 10 && (question2.length !== 0 || question2Other !== "");
+  const isQuestion3Filled =
+    currentStep === 20 &&
+    question3 !== "" &&
+    !["Một ngày qua", "Ba ngày qua", "Một tuần qua", "Một tháng qua"].includes(
+      question3
+    );
+  const isQuestion4Filled =
+    currentStep === 30 && (question4.length !== 0 || question4Other !== "");
+
+  const isCurrentStepFilled =
+    (currentStep === 0 && question1 !== "") ||
+    (currentStep === 10 && question2.length === 0 && question2Other === "") ||
+    (currentStep === 20 && question3 !== "") ||
+    (currentStep === 30 && question4.length === 0 && question4Other === "") ||
+    (currentStep === 40 && question5 !== "") ||
+    (currentStep === 50 && question6 !== "") ||
+    (currentStep === 60 && question7 !== "");
+
+  const shouldRenderButton =
+    isQuestion2Filled ||
+    isQuestion3Filled ||
+    isQuestion4Filled ||
+    (isCurrentStepFilled && currentStep < step);
+
+  const handleDiagnostic = async () => {
+    try {
+      setIsLoading(true);
+      const data = {
+        question1: question1,
+        question2:
+          question2.length !== 0
+            ? question2.join(", ") +
+              (question2Other ? ", " + question2Other : "")
+            : question2Other,
+        question3: question3,
+        question4:
+          question4.length !== 0
+            ? question4.join(", ") +
+              (question4Other ? ", " + question4Other : "")
+            : question4Other,
+        question5: question5,
+        question6: question6,
+        question7: question7,
+        patientHistory: userInfo,
+      };
+      console.log(data);
+      const response = await axios
+        .create()
+        .post("https://hstc.onrender.com/diagnosis", data);
+
+      if (response.data.message === "success") {
+        clearData();
+        setIsLoading(false);
+        // console.log("Data: ", response.data.data);
+        navigation.navigate("Result", {
+          data: response.data.data,
+        });
+      } else {
+        console.log("No data", response.data.message);
+        setIsLoading(false);
+      }
+    } catch (error) {
+      console.log("Error: ", error);
+    }
   };
 
   useEffect(() => {
@@ -221,43 +295,17 @@ const Chat = ({ navigation }: any) => {
   }, [focus]);
 
   useEffect(() => {
-    if (checkInput()) {
-      if (currentStep === 60) {
-        // setIsLoading(true);
-        const data = {
-          question1: question1,
-          question2: question2,
-          question3: question3,
-          question4: question4,
-          question5: question5,
-          question6: question6,
-          question7: question7,
-          patientHistory: userInfo,
-        };
-        console.log(data);
-
-        // setTimeout(() => {
-        //   console.log("Data: ", { question1, question2, question3, question4 });
-
-        //   navigation.navigate("Result", {
-        //     data: {
-        //       question1,
-        //       question2,
-        //       question3,
-        //       question4,
-        //       question5,
-        //       question6,
-        //       question7,
-        //     },
-        //   });
-        //   clearData();
-        //   setIsLoading(false);
-        // }, 4000);
-        return;
-      } else {
-        handleNext();
+    const fetchData = async () => {
+      if (checkInput()) {
+        if (currentStep === 60) {
+          setIsSubmit(true);
+        } else {
+          setIsSubmit(false);
+          handleNext();
+        }
       }
-    }
+    };
+    fetchData();
   }, [
     question1,
     question2,
@@ -554,16 +602,18 @@ const Chat = ({ navigation }: any) => {
                     rounded={"full"}
                     marginY={1}
                     bg={
-                      question2 === "Sốt" ? Colors.primaryMintDark : "light.50"
+                      question2.find((item) => item === "Sốt")
+                        ? Colors.primaryMintDark
+                        : "light.50"
                     }
                     _text={
-                      question2 === "Sốt"
+                      question2.find((item) => item === "Sốt")
                         ? { color: Colors.white }
                         : { color: Colors.primaryMintDark }
                     }
                     variant={"outline"}
                     borderColor={Colors.primaryMintDark}
-                    onPress={() => setQuestion2("Sốt")}
+                    onPress={() => handleInputQuestion2("Sốt")}
                   >
                     Sốt
                   </Button>
@@ -571,16 +621,18 @@ const Chat = ({ navigation }: any) => {
                     rounded={"full"}
                     marginY={1}
                     bg={
-                      question2 === "Ho" ? Colors.primaryMintDark : "light.50"
+                      question2.find((item) => item === "Ho")
+                        ? Colors.primaryMintDark
+                        : "light.50"
                     }
                     _text={
-                      question2 === "Ho"
+                      question2.find((item) => item === "Ho")
                         ? { color: Colors.white }
                         : { color: Colors.primaryMintDark }
                     }
                     variant={"outline"}
                     borderColor={Colors.primaryMintDark}
-                    onPress={() => setQuestion2("Ho")}
+                    onPress={() => handleInputQuestion2("Ho")}
                   >
                     Ho
                   </Button>
@@ -588,18 +640,18 @@ const Chat = ({ navigation }: any) => {
                     rounded={"full"}
                     marginY={1}
                     bg={
-                      question2 === "Đau họng"
+                      question2.find((item) => item === "Đau họng")
                         ? Colors.primaryMintDark
                         : "light.50"
                     }
                     _text={
-                      question2 === "Đau họng"
+                      question2.find((item) => item === "Đau họng")
                         ? { color: Colors.white }
                         : { color: Colors.primaryMintDark }
                     }
                     variant={"outline"}
                     borderColor={Colors.primaryMintDark}
-                    onPress={() => setQuestion2("Đau họng")}
+                    onPress={() => handleInputQuestion2("Đau họng")}
                   >
                     Đau họng
                   </Button>
@@ -607,18 +659,18 @@ const Chat = ({ navigation }: any) => {
                     rounded={"full"}
                     marginY={1}
                     bg={
-                      question2 === "Chảy nước mũi"
+                      question2.find((item) => item === "Chảy nước mũi")
                         ? Colors.primaryMintDark
                         : "light.50"
                     }
                     _text={
-                      question2 === "Chảy nước mũi"
+                      question2.find((item) => item === "Chảy nước mũi")
                         ? { color: Colors.white }
                         : { color: Colors.primaryMintDark }
                     }
                     variant={"outline"}
                     borderColor={Colors.primaryMintDark}
-                    onPress={() => setQuestion2("Chảy nước mũi")}
+                    onPress={() => handleInputQuestion2("Chảy nước mũi")}
                   >
                     Chảy nước mũi
                   </Button>
@@ -626,18 +678,18 @@ const Chat = ({ navigation }: any) => {
                     rounded={"full"}
                     marginY={1}
                     bg={
-                      question2 === "Nghẹt mũi"
+                      question2.find((item) => item === "Nghẹt mũi")
                         ? Colors.primaryMintDark
                         : "light.50"
                     }
                     _text={
-                      question2 === "Nghẹt mũi"
+                      question2.find((item) => item === "Nghẹt mũi")
                         ? { color: Colors.white }
                         : { color: Colors.primaryMintDark }
                     }
                     variant={"outline"}
                     borderColor={Colors.primaryMintDark}
-                    onPress={() => setQuestion2("Nghẹt mũi")}
+                    onPress={() => handleInputQuestion2("Nghẹt mũi")}
                   >
                     Nghẹt mũi
                   </Button>
@@ -645,18 +697,18 @@ const Chat = ({ navigation }: any) => {
                     rounded={"full"}
                     marginY={1}
                     bg={
-                      question2 === "Đau đầu"
+                      question2.find((item) => item === "Đau đầu")
                         ? Colors.primaryMintDark
                         : "light.50"
                     }
                     _text={
-                      question2 === "Đau đầu"
+                      question2.find((item) => item === "Đau đầu")
                         ? { color: Colors.white }
                         : { color: Colors.primaryMintDark }
                     }
                     variant={"outline"}
                     borderColor={Colors.primaryMintDark}
-                    onPress={() => setQuestion2("Đau đầu")}
+                    onPress={() => handleInputQuestion2("Đau đầu")}
                   >
                     Đau đầu
                   </Button>
@@ -664,18 +716,18 @@ const Chat = ({ navigation }: any) => {
                     rounded={"full"}
                     marginY={1}
                     bg={
-                      question2 === "Đau cơ"
+                      question2.find((item) => item === "Đau cơ")
                         ? Colors.primaryMintDark
                         : "light.50"
                     }
                     _text={
-                      question2 === "Đau cơ"
+                      question2.find((item) => item === "Đau cơ")
                         ? { color: Colors.white }
                         : { color: Colors.primaryMintDark }
                     }
                     variant={"outline"}
                     borderColor={Colors.primaryMintDark}
-                    onPress={() => setQuestion2("Đau cơ")}
+                    onPress={() => handleInputQuestion2("Đau cơ")}
                   >
                     Đau cơ
                   </Button>
@@ -683,18 +735,18 @@ const Chat = ({ navigation }: any) => {
                     rounded={"full"}
                     marginY={1}
                     bg={
-                      question2 === "Mệt mỏi"
+                      question2.find((item) => item === "Mệt mỏi")
                         ? Colors.primaryMintDark
                         : "light.50"
                     }
                     _text={
-                      question2 === "Mệt mỏi"
+                      question2.find((item) => item === "Mệt mỏi")
                         ? { color: Colors.white }
                         : { color: Colors.primaryMintDark }
                     }
                     variant={"outline"}
                     borderColor={Colors.primaryMintDark}
-                    onPress={() => setQuestion2("Mệt mỏi")}
+                    onPress={() => handleInputQuestion2("Mệt mỏi")}
                   >
                     Mệt mỏi
                   </Button>
@@ -702,18 +754,24 @@ const Chat = ({ navigation }: any) => {
                     rounded={"full"}
                     marginY={1}
                     bg={
-                      question2 === "Mất vị giác hoặc khứu giác"
+                      question2.find(
+                        (item) => item === "Mất vị giác hoặc khứu giác"
+                      )
                         ? Colors.primaryMintDark
                         : "light.50"
                     }
                     _text={
-                      question2 === "Mất vị giác hoặc khứu giác"
+                      question2.find(
+                        (item) => item === "Mất vị giác hoặc khứu giác"
+                      )
                         ? { color: Colors.white }
                         : { color: Colors.primaryMintDark }
                     }
                     variant={"outline"}
                     borderColor={Colors.primaryMintDark}
-                    onPress={() => setQuestion2("Mất vị giác hoặc khứu giác")}
+                    onPress={() =>
+                      handleInputQuestion2("Mất vị giác hoặc khứu giác")
+                    }
                   >
                     Mất vị giác hoặc khứu giác
                   </Button>
@@ -722,20 +780,8 @@ const Chat = ({ navigation }: any) => {
                   rounded={"full"}
                   placeholder="Khác"
                   marginTop={5}
-                  value={
-                    question2 === "Sốt" ||
-                    question2 === "Ho" ||
-                    question2 === "Đau họng" ||
-                    question2 === "Chảy nước mũi" ||
-                    question2 === "Nghẹt mũi" ||
-                    question2 === "Đau đầu" ||
-                    question2 === "Đau cơ" ||
-                    question2 === "Mệt mỏi" ||
-                    question2 === "Mất vị giác hoặc khứu giác"
-                      ? ""
-                      : question2
-                  }
-                  onChangeText={(text) => setQuestion2(text)}
+                  value={question2Other}
+                  onChangeText={(text) => setQuestion2Other(text)}
                 />
               </Animated.View>
             )}
@@ -869,18 +915,18 @@ const Chat = ({ navigation }: any) => {
                     rounded={"full"}
                     marginY={1}
                     bg={
-                      question4 === "Khó ngủ"
+                      question4.find((item) => item === "Khó ngủ")
                         ? Colors.primaryMintDark
                         : "light.50"
                     }
                     _text={
-                      question4 === "Khó ngủ"
+                      question4.find((item) => item === "Khó ngủ")
                         ? { color: Colors.white }
                         : { color: Colors.primaryMintDark }
                     }
                     variant={"outline"}
                     borderColor={Colors.primaryMintDark}
-                    onPress={() => setQuestion4("Khó ngủ")}
+                    onPress={() => handleInputQuestion4("Khó ngủ")}
                   >
                     Khó ngủ
                   </Button>
@@ -888,18 +934,18 @@ const Chat = ({ navigation }: any) => {
                     rounded={"full"}
                     marginY={1}
                     bg={
-                      question4 === "Mất tập trung"
+                      question4.find((item) => item === "Mất tập trung")
                         ? Colors.primaryMintDark
                         : "light.50"
                     }
                     _text={
-                      question4 === "Mất tập trung"
+                      question4.find((item) => item === "Mất tập trung")
                         ? { color: Colors.white }
                         : { color: Colors.primaryMintDark }
                     }
                     variant={"outline"}
                     borderColor={Colors.primaryMintDark}
-                    onPress={() => setQuestion4("Mất tập trung")}
+                    onPress={() => handleInputQuestion4("Mất tập trung")}
                   >
                     Mất tập trung
                   </Button>
@@ -907,18 +953,18 @@ const Chat = ({ navigation }: any) => {
                     rounded={"full"}
                     marginY={1}
                     bg={
-                      question4 === "Giảm cân"
+                      question4.find((item) => item === "Giảm cân")
                         ? Colors.primaryMintDark
                         : "light.50"
                     }
                     _text={
-                      question4 === "Giảm cân"
+                      question4.find((item) => item === "Giảm cân")
                         ? { color: Colors.white }
                         : { color: Colors.primaryMintDark }
                     }
                     variant={"outline"}
                     borderColor={Colors.primaryMintDark}
-                    onPress={() => setQuestion4("Giảm cân")}
+                    onPress={() => handleInputQuestion4("Giảm cân")}
                   >
                     Giảm cân
                   </Button>
@@ -926,18 +972,18 @@ const Chat = ({ navigation }: any) => {
                     rounded={"full"}
                     marginY={1}
                     bg={
-                      question4 === "Yếu ớt"
+                      question4.find((item) => item === "Yếu ớt")
                         ? Colors.primaryMintDark
                         : "light.50"
                     }
                     _text={
-                      question4 === "Yếu ớt"
+                      question4.find((item) => item === "Yếu ớt")
                         ? { color: Colors.white }
                         : { color: Colors.primaryMintDark }
                     }
                     variant={"outline"}
                     borderColor={Colors.primaryMintDark}
-                    onPress={() => setQuestion4("Yếu ớt")}
+                    onPress={() => handleInputQuestion4("Yếu ớt")}
                   >
                     Yếu ớt
                   </Button>
@@ -945,18 +991,18 @@ const Chat = ({ navigation }: any) => {
                     rounded={"full"}
                     marginY={1}
                     bg={
-                      question4 === "Khó chịu"
+                      question4.find((item) => item === "Khó chịu")
                         ? Colors.primaryMintDark
                         : "light.50"
                     }
                     _text={
-                      question4 === "Khó chịu"
+                      question4.find((item) => item === "Khó chịu")
                         ? { color: Colors.white }
                         : { color: Colors.primaryMintDark }
                     }
                     variant={"outline"}
                     borderColor={Colors.primaryMintDark}
-                    onPress={() => setQuestion4("Khó chịu")}
+                    onPress={() => handleInputQuestion4("Khó chịu")}
                   >
                     Khó chịu
                   </Button>
@@ -964,18 +1010,18 @@ const Chat = ({ navigation }: any) => {
                     rounded={"full"}
                     marginY={1}
                     bg={
-                      question4 === "Lo lắng"
+                      question4.find((item) => item === "Lo lắng")
                         ? Colors.primaryMintDark
                         : "light.50"
                     }
                     _text={
-                      question4 === "Lo lắng"
+                      question4.find((item) => item === "Lo lắng")
                         ? { color: Colors.white }
                         : { color: Colors.primaryMintDark }
                     }
                     variant={"outline"}
                     borderColor={Colors.primaryMintDark}
-                    onPress={() => setQuestion4("Lo lắng")}
+                    onPress={() => handleInputQuestion4("Lo lắng")}
                   >
                     Lo lắng
                   </Button>
@@ -983,18 +1029,24 @@ const Chat = ({ navigation }: any) => {
                     rounded={"full"}
                     marginY={1}
                     bg={
-                      question4 === "Mất cảm giác ngon miệng"
+                      question4.find(
+                        (item) => item === "Mất cảm giác ngon miệng"
+                      )
                         ? Colors.primaryMintDark
                         : "light.50"
                     }
                     _text={
-                      question4 === "Mất cảm giác ngon miệng"
+                      question4.find(
+                        (item) => item === "Mất cảm giác ngon miệng"
+                      )
                         ? { color: Colors.white }
                         : { color: Colors.primaryMintDark }
                     }
                     variant={"outline"}
                     borderColor={Colors.primaryMintDark}
-                    onPress={() => setQuestion4("Mất cảm giác ngon miệng")}
+                    onPress={() =>
+                      handleInputQuestion4("Mất cảm giác ngon miệng")
+                    }
                   >
                     Mất cảm giác ngon miệng
                   </Button>
@@ -1003,18 +1055,8 @@ const Chat = ({ navigation }: any) => {
                   rounded={"full"}
                   placeholder="Triệu chứng khác"
                   marginTop={2}
-                  value={
-                    question4 === "Khó ngủ" ||
-                    question4 === "Mất tập trung" ||
-                    question4 === "Giảm cân" ||
-                    question4 === "Yếu ớt" ||
-                    question4 === "Khó chịu" ||
-                    question4 === "Lo lắng" ||
-                    question4 === "Mất cảm giác ngon miệng"
-                      ? ""
-                      : question4
-                  }
-                  onChangeText={(text) => setQuestion4(text)}
+                  value={question4Other}
+                  onChangeText={(text) => setQuestion4Other(text)}
                 />
               </Animated.View>
             )}
@@ -1224,16 +1266,7 @@ const Chat = ({ navigation }: any) => {
             <Spacer />
           )}
           {/* {(currentStep === 10 &&
-            question2 !== "Sốt" &&
-            question2 !== "Ho" &&
-            question2 !== "Đau họng" &&
-            question2 !== "Chảy nước mũi" &&
-            question2 !== "Nghẹt mũi" &&
-            question2 !== "Đau đầu" &&
-            question2 !== "Đau cơ" &&
-            question2 !== "Mệt mỏi" &&
-            question2 !== "Mất vị giác hoặc khứu giác" &&
-            question2 !== "") ||
+            (question2.length !== 0 || question2Other !== "")) ||
           (currentStep === 20 &&
             question3 !== "Một ngày qua" &&
             question3 !== "Ba ngày qua" &&
@@ -1241,30 +1274,20 @@ const Chat = ({ navigation }: any) => {
             question3 !== "Một tháng qua" &&
             question3 !== "") ||
           (currentStep === 30 &&
-            question4 !== "Khó ngủ" &&
-            question4 !== "Mất tập trung" &&
-            question4 !== "Giảm cân" &&
-            question4 !== "Yếu ớt" &&
-            question4 !== "Khó chịu" &&
-            question4 !== "Lo lắng" &&
-            question4 !== "Mất cảm giác ngon miệng" &&
-            question4 !== "") ||
+            (question4.length !== 0 || question4Other !== "")) ||
           (((currentStep === 0 && question1 !== "") ||
-            (currentStep === 10 && question2 !== "") ||
+            (currentStep === 10 &&
+              question2.length === 0 &&
+              question2Other === "") ||
             (currentStep === 20 && question3 !== "") ||
-            (currentStep === 30 && question4 !== "") ||
+            (currentStep === 30 &&
+              question4.length === 0 &&
+              question4Other === "") ||
             (currentStep === 40 && question5 !== "") ||
             (currentStep === 50 && question6 !== "") ||
             (currentStep === 60 && question7 !== "")) &&
             currentStep < step) ? ( */}
-          {(steps[currentStep as keyof typeof steps] &&
-            !steps[currentStep as keyof typeof steps].includes(
-              questions[currentStep / 10]
-            )) ||
-          (questions.some(
-            (question, index) => index * 10 === currentStep && question !== ""
-          ) &&
-            currentStep < step) ? (
+          {shouldRenderButton ? (
             <Button
               alignSelf={"flex-end"}
               rounded={"full"}
@@ -1283,6 +1306,24 @@ const Chat = ({ navigation }: any) => {
             </Button>
           ) : (
             <Spacer />
+          )}
+          {isSubmit && currentStep === 60 && step === 60 && (
+            <Button
+              alignSelf={"flex-end"}
+              rounded={"full"}
+              bg={Colors.primaryMintDark}
+              rightIcon={
+                <Icon
+                  as={AntDesign}
+                  name="check"
+                  size="sm"
+                  color={Colors.white}
+                />
+              }
+              onPress={handleDiagnostic}
+            >
+              Hoàn tất
+            </Button>
           )}
           {/* {(currentStep === 0 && question1 !== "") ||
           (currentStep === 10 && question2 !== "") ||
@@ -1320,37 +1361,6 @@ const Chat = ({ navigation }: any) => {
           max={60}
         />
       </View>
-      {/* <AlertDialog
-        leastDestructiveRef={cancelRef}
-        isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
-      >
-        <AlertDialog.Content>
-          <AlertDialog.Header>Thoát khỏi chẩn đoán</AlertDialog.Header>
-          <AlertDialog.Body>
-            Dữ liệu hiện tại của bạn sẽ không được lưu lại
-          </AlertDialog.Body>
-          <AlertDialog.Footer>
-            <Button.Group space={2}>
-              <Button
-                variant="unstyled"
-                colorScheme="coolGray"
-                onPress={() => setIsOpen(false)}
-                ref={cancelRef}
-              >
-                Hủy
-              </Button>
-              <Button
-                rounded={"full"}
-                colorScheme="danger"
-                onPress={() => handleEscape()}
-              >
-                Thoát
-              </Button>
-            </Button.Group>
-          </AlertDialog.Footer>
-        </AlertDialog.Content>
-      </AlertDialog> */}
     </View>
   );
 };

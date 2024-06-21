@@ -56,7 +56,7 @@ const TabBar = () => {
           name="Information"
           component={Information}
           options={{
-            tabBarLabel: "Thông báo",
+            tabBarLabel: "Thông tin",
             tabBarIcon: ({ color }) => (
               <Icon
                 as={FontAwesome}

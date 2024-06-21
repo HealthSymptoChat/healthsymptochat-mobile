@@ -54,7 +54,7 @@ const Profiles = ({ navigation }: any) => {
           color={Colors.primaryMintDark}
         />
       </TouchableOpacity>
-      <TouchableOpacity
+      {/* <TouchableOpacity
         style={{
           paddingVertical: 10,
           borderBottomColor: Colors.grey,
@@ -123,7 +123,7 @@ const Profiles = ({ navigation }: any) => {
           size={6}
           color={Colors.primaryMintDark}
         />
-      </TouchableOpacity>
+      </TouchableOpacity> */}
       <Heading size="md" style={{ marginVertical: 10 }}>
         Hoạt động
       </Heading>
