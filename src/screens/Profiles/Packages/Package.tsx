@@ -40,6 +40,7 @@ const Package = ({ navigation }: any) => {
   const { authAxios }: any = useContext(AxiosContext);
   const focus = useIsFocused();
   const toast = useToast();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [selectedPackage, setSelectedPackage] = useState<Package>();
   const [duration, setDuration] = useState<number>(3);
   const { isOpen, onOpen, onClose } = useDisclose();
@@ -69,6 +70,7 @@ const Package = ({ navigation }: any) => {
 
   const handlePurchasePackage = async () => {
     try {
+      setIsLoading(true);
       console.log("Redirect uri", redirectUri);
       console.log(calculateTotalPrice());
       const total = calculateTotalPrice();
@@ -81,9 +83,11 @@ const Package = ({ navigation }: any) => {
 
       if (url.data.message === "success") {
         WebBrowser.openBrowserAsync(url.data.data.checkoutUrl);
+        setIsLoading(false);
         // onClose();
       }
     } catch (error: any) {
+      setIsLoading(false);
       console.log("Error purchase package", error);
     }
   };
@@ -408,6 +412,7 @@ const Package = ({ navigation }: any) => {
               {formatNumber(calculateTotalPrice())} VNĐ
             </Text>
             <Button
+              isLoading={isLoading}
               m={5}
               bg={Colors.primaryMintDark}
               rounded="full"

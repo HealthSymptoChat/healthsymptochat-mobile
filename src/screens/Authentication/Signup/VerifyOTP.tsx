@@ -10,24 +10,38 @@ const VerifyOTP = ({ navigation, route }: any) => {
   const { email }: { email: string } = route.params || "";
   const toast = useToast();
   const { authAxios }: any = useContext(AxiosContext);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [otp, setOtp] = useState<String | "">("");
 
   const handleInputOtp = async () => {
     try {
-      console.log(otp, email);
+      setIsLoading(true);
       const response = await authAxios.post("/otp/verifyOTP", {
         email,
         otp,
       });
-      console.log(response.data);
       if (response.data.message === "success") {
+        setIsLoading(false);
         navigation.navigate("InputInfo", { email });
-      } else {
+      } else if (response.data.message === "OTP is expired") {
+        setIsLoading(false);
         console.log(response.data.message);
         toast.show({
           render: () => (
             <CustomToast
-              message="Đã có lỗi xảy ra, vui lòng thử lại"
+              message="Mã OTP đã hết hạn"
+              state="error"
+              onClose={() => toast.closeAll()}
+            />
+          ),
+        });
+      } else {
+        setIsLoading(false);
+        console.log(response.data.message);
+        toast.show({
+          render: () => (
+            <CustomToast
+              message="Mã OTP không chính xác"
               state="error"
               onClose={() => toast.closeAll()}
             />
@@ -35,6 +49,7 @@ const VerifyOTP = ({ navigation, route }: any) => {
         });
       }
     } catch (error: Error | any) {
+      setIsLoading(false);
       console.log("Error signing up", error);
     }
   };
@@ -74,6 +89,7 @@ const VerifyOTP = ({ navigation, route }: any) => {
         />
       </View>
       <Button
+        isLoading={isLoading}
         style={{ marginTop: 20, marginHorizontal: 30 }}
         rounded="full"
         variant="solid"

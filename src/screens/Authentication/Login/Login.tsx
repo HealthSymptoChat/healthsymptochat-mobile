@@ -33,6 +33,7 @@ GoogleSignin.configure({
 const Login = ({ navigation }: any) => {
   const { colorMode } = useColorMode();
   const toast = useToast();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [showPassword, setShowPassword] = useState<boolean>(false);
@@ -63,6 +64,7 @@ const Login = ({ navigation }: any) => {
         });
         return;
       }
+      setIsLoading(true);
       const response = await publicAxios.post("/auth/login", {
         username: username,
         password: password,
@@ -78,6 +80,7 @@ const Login = ({ navigation }: any) => {
           authenticated: true,
           user,
         });
+        setIsLoading(false);
         toast.show({
           render: () => (
             <CustomToast
@@ -91,6 +94,7 @@ const Login = ({ navigation }: any) => {
         });
       } else {
         console.log(response.data.message);
+        setIsLoading(false);
         toast.show({
           render: () => (
             <CustomToast
@@ -105,6 +109,7 @@ const Login = ({ navigation }: any) => {
       }
     } catch (error) {
       console.log("Login failed", error);
+      setIsLoading(false);
       toast.show({
         render: () => (
           <CustomToast
@@ -121,6 +126,7 @@ const Login = ({ navigation }: any) => {
 
   const onGoogleButtonPress = async () => {
     try {
+      setIsLoading(true);
       await GoogleSignin.hasPlayServices();
       const userInfo = await GoogleSignin.signIn();
 
@@ -138,6 +144,7 @@ const Login = ({ navigation }: any) => {
             authenticated: true,
             user,
           });
+          setIsLoading(false);
           toast.show({
             render: () => (
               <CustomToast
@@ -150,6 +157,7 @@ const Login = ({ navigation }: any) => {
             ),
           });
         } else {
+          setIsLoading(false);
           console.log(response.data.message);
           toast.show({
             render: () => (
@@ -164,9 +172,11 @@ const Login = ({ navigation }: any) => {
           });
         }
       } catch (error: any) {
+        setIsLoading(false);
         console.log("Login failed", error);
       }
     } catch (error: any) {
+      setIsLoading(false);
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
         // user cancelled the login flow
         console.log("cancelled");
@@ -252,6 +262,7 @@ const Login = ({ navigation }: any) => {
           onChange={(e) => setPassword(e.nativeEvent.text)}
         />
         <Button
+          isLoading={isLoading}
           rounded="full"
           bg={Colors.primaryMintDark}
           style={{ margin: 20 }}

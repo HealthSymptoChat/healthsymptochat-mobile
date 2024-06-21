@@ -49,6 +49,7 @@ const InputInfo = ({ route }: any) => {
   const authContext: any = useContext(AuthContext);
   const { email } = route.params;
   const toast = useToast();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [showConfirmPassword, setShowConfirmPassword] =
     useState<boolean>(false);
@@ -106,14 +107,7 @@ const InputInfo = ({ route }: any) => {
         });
         return;
       }
-      console.log(
-        email,
-        firstName,
-        lastName,
-        username,
-        password,
-        confirmPassword
-      );
+      setIsLoading(true);
       const response = await publicAxios.post("/auth/signup", {
         email: email,
         firstName: firstName,
@@ -134,6 +128,7 @@ const InputInfo = ({ route }: any) => {
           authenticated: true,
           user,
         });
+        setIsLoading(false);
         toast.show({
           render: () => (
             <CustomToast
@@ -144,6 +139,7 @@ const InputInfo = ({ route }: any) => {
           ),
         });
       } else {
+        setIsLoading(false);
         toast.show({
           render: () => (
             <CustomToast
@@ -335,6 +331,7 @@ const InputInfo = ({ route }: any) => {
             !password ||
             !confirmPassword
           }
+          isLoading={isLoading}
           bg={Colors.primaryMintDark}
           onPress={handleRegisterUser}
         >

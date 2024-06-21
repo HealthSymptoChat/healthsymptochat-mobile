@@ -54,6 +54,7 @@ const UserInfo = ({ navigation }: any) => {
   const { authAxios }: any = useContext(AxiosContext);
   const authContext: any = useContext(AuthContext);
   const toast = useToast();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [openEdit, setOpenEdit] = useState<boolean>(false);
   const [showDatePicker, setShowDatePicker] = useState<boolean>(false);
   const [dob, setDob] = useState<CalendarDate | undefined>(undefined);
@@ -195,6 +196,7 @@ const UserInfo = ({ navigation }: any) => {
 
   const logout = async () => {
     try {
+      setIsLoading(true);
       const response = await authAxios.post("/auth/logout", {
         refreshToken: authContext.authState.refreshToken,
       });
@@ -205,6 +207,7 @@ const UserInfo = ({ navigation }: any) => {
         await SecureStore.deleteItemAsync("user");
         await GoogleSignin.signOut();
         await authContext.logout();
+        setIsLoading(false);
         toast.show({
           render: () => (
             <CustomToast
@@ -216,9 +219,23 @@ const UserInfo = ({ navigation }: any) => {
             />
           ),
         });
+      } else {
+        console.log("Logout failed", response.data.message);
+        setIsLoading(false);
+        toast.show({
+          render: () => (
+            <CustomToast
+              message="Đăng xuất thất bại"
+              state="error"
+              onClose={() => {
+                toast.closeAll();
+              }}
+            />
+          ),
+        });
       }
     } catch (error) {
-      console.log(error);
+      console.log("Error", error);
     }
   };
   return (
@@ -1007,6 +1024,7 @@ const UserInfo = ({ navigation }: any) => {
           />
         </View> */}
         <Button
+          isLoading={isLoading}
           marginY={2}
           rounded="full"
           variant="outline"

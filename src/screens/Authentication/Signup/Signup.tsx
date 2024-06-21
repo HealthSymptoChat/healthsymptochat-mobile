@@ -23,18 +23,43 @@ const Signup = ({ navigation }: any) => {
   const { colorMode } = useColorMode();
   const toast = useToast();
   const [email, setEmail] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const { authAxios }: any = useContext(AxiosContext);
 
   const handleSignup = async () => {
     try {
-      console.log(email);
+      if (!email) {
+        toast.show({
+          render: () => (
+            <CustomToast
+              message="Vui lòng nhập đầy đủ thông tin"
+              state="error"
+              onClose={() => toast.closeAll()}
+            />
+          ),
+        });
+        return;
+      }
+      setIsLoading(true);
       const response = await authAxios.post("/otp/sendOTP", {
         email,
       });
-      console.log(response.data);
       if (response.data.message === "success") {
+        setIsLoading(false);
         navigation.navigate("VerifyOTP", { email });
+      } else if (response.data.message === "Email is already in use") {
+        setIsLoading(false);
+        toast.show({
+          render: () => (
+            <CustomToast
+              message="Email đã được sử dụng"
+              state="error"
+              onClose={() => toast.closeAll()}
+            />
+          ),
+        });
       } else {
+        setIsLoading(false);
         toast.show({
           render: () => (
             <CustomToast
@@ -130,6 +155,7 @@ const Signup = ({ navigation }: any) => {
           onChange={(e) => setConfirmPassword(e.nativeEvent.text)}
         /> */}
         <Button
+          isLoading={isLoading}
           rounded="full"
           bg={Colors.primaryMintDark}
           style={{ margin: 20, marginTop: 40 }}
