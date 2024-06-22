@@ -11,7 +11,7 @@ const { Provider } = AxiosContext;
 const AxiosProvider = ({ children }) => {
   const authContext = useContext(AuthContext);
 
-  const baseURL = "https://hsc-sever.onrender.com/api/v1";
+  const baseURL = "https://hsc-sever-0r5m.onrender.com/api/v1";
   // const baseURL = "https://hsc-sever.vercel.app/api/v1";
   // const baseURL = "http://10.0.2.2:5000/api/v1";
 

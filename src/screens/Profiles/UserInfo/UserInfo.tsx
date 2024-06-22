@@ -235,6 +235,7 @@ const UserInfo = ({ navigation }: any) => {
         });
       }
     } catch (error) {
+      setIsLoading(false);
       console.log("Error", error);
     }
   };
