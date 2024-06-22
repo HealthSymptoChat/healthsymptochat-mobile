@@ -35,9 +35,11 @@ const AssessmentHistory = ({ navigation }: any) => {
         setIsLoading(false);
       } else {
         setIsLoading(false);
+        setUserAssessments([]);
         console.log("Error: ", response.data.message);
       }
     } catch (error) {
+      setIsLoading(false);
       console.log("Error: ", error);
     }
   };
@@ -46,20 +48,20 @@ const AssessmentHistory = ({ navigation }: any) => {
     fetchUserAssessment();
   }, []);
 
-  if (isLoading) {
-    return (
-      <View
-        width={"100%"}
-        position={"absolute"}
-        paddingY={"full"}
-        zIndex={999}
-        alignSelf={"center"}
-        style={{ backgroundColor: "rgba(255, 255, 255, 0.5)" }}
-      >
-        <Spinner color={Colors.primaryMintDark} size={50} />
-      </View>
-    );
-  }
+  // if (isLoading) {
+  //   return (
+  //     <View
+  //       width={"100%"}
+  //       position={"absolute"}
+  //       paddingY={"full"}
+  //       zIndex={999}
+  //       alignSelf={"center"}
+  //       style={{ backgroundColor: "rgba(255, 255, 255, 0.5)" }}
+  //     >
+  //       <Spinner color={Colors.primaryMintDark} size={50} />
+  //     </View>
+  //   );
+  // }
   return (
     <View
       _dark={{
@@ -70,6 +72,18 @@ const AssessmentHistory = ({ navigation }: any) => {
       }}
       style={{ height: "100%", width: "100%" }}
     >
+      {isLoading && (
+        <View
+          width={"100%"}
+          position={"absolute"}
+          paddingY={"full"}
+          zIndex={999}
+          alignSelf={"center"}
+          style={{ backgroundColor: "rgba(255, 255, 255, 1)" }}
+        >
+          <Spinner color={Colors.primaryMintDark} size={50} />
+        </View>
+      )}
       {userAssessments.length > 0 ? (
         <ScrollView style={{ height: "100%", width: "100%", padding: 10 }}>
           {/* <ScrollView showsVerticalScrollIndicator={false}> */}
