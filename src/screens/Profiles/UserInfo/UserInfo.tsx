@@ -75,6 +75,7 @@ const UserInfo = ({ navigation }: any) => {
     isGeneticDisease: false,
     isSmoke: false,
     isExercise: false,
+    avatar: "",
   });
 
   const onDismissSingle = React.useCallback(() => {
@@ -128,6 +129,7 @@ const UserInfo = ({ navigation }: any) => {
           isGeneticDisease: family_genetic_disease === "Có" ? true : false,
           isSmoke: uses_tobacco === "Có" ? true : false,
           isExercise: exercises_regularly === "Có" ? true : false,
+          avatar: user?.avatar,
         });
       } else {
         console.log("User info not found", response.data);
@@ -247,53 +249,56 @@ const UserInfo = ({ navigation }: any) => {
       _light={{
         bg: "light.50",
       }}
-      style={{ height: "100%", width: "100%", padding: 20 }}
+      style={{ height: "100%", width: "100%" }}
     >
       <StatusBar
         barStyle={colorMode === "dark" ? "light-content" : "dark-content"}
         backgroundColor={colorMode === "dark" ? Colors.black : Colors.white}
       />
-      <View
-        width={width + 60}
-        height={width + 40}
-        borderStyle={"solid"}
-        borderRadius={"full"}
-        marginBottom={10}
-        padding={5}
-        position={"absolute"}
-        top={-300}
-        left={-30}
-        bg={Colors.primaryMint}
-      />
-      <View
-        marginTop={5}
-        display={"flex"}
-        flexDirection={"column"}
-        justifyContent={"center"}
-        alignItems={"center"}
-      >
-        <Heading marginBottom={10} fontSize="lg" color={Colors.black}>
-          {userInfo.username ? userInfo.username : "Username"}
-        </Heading>
+      <ScrollView paddingX={5} showsVerticalScrollIndicator={false}>
         <View
-          padding={5}
-          borderStyle={"solid"}
-          borderRadius={"full"}
-          bg={Colors.white}
-          alignSelf={"center"}
+          // marginTop={5}
+          display={"flex"}
+          flexDirection={"column"}
+          justifyContent={"center"}
+          alignItems={"center"}
         >
-          <Icon
-            as={AntDesign}
-            name={"user"}
-            size={10}
-            color={Colors.primaryMintDark}
-          />
+          {userInfo.avatar ? (
+            <Image
+              source={{ uri: userInfo.avatar }}
+              alt="avatar"
+              size={20}
+              rounded={"full"}
+              marginBottom={5}
+            />
+          ) : (
+            <View
+              padding={5}
+              borderStyle={"solid"}
+              borderRadius={"full"}
+              bg={Colors.white}
+              alignSelf={"center"}
+              marginBottom={6}
+            >
+              <Icon
+                as={AntDesign}
+                name={"user"}
+                size={10}
+                color={Colors.primaryMintDark}
+              />
+            </View>
+          )}
+          <Heading fontSize="xl" marginBottom={5}>
+            {userInfo.username ? userInfo.username : "Username"}
+          </Heading>
         </View>
-      </View>
-      <ScrollView>
         {!isHaveValue ? (
           <View>
-            <Heading size="md" style={{ marginBottom: 10 }}>
+            <Heading
+              size="md"
+              textAlign={"center"}
+              style={{ marginBottom: 10 }}
+            >
               Thông tin cá nhân
             </Heading>
             <View>
@@ -388,26 +393,29 @@ const UserInfo = ({ navigation }: any) => {
               >
                 Công việc
               </Text>
-              <Select
-                width={"100%"}
-                marginBottom={5}
-                alignSelf={"center"}
-                placeholder="Chọn công việc"
-                rounded={"full"}
-                isDisabled={!openEdit}
-                selectedValue={userInfo.job || ""}
-                onValueChange={(itemValue) =>
-                  setUserInfo({ ...userInfo, job: itemValue })
+              <Input
+                variant="underlined"
+                value={userInfo.job}
+                onChange={(e) =>
+                  setUserInfo({ ...userInfo, job: e.nativeEvent.text })
                 }
-              >
-                <Select.Item label="Học sinh" value="Học sinh" />
-                <Select.Item label="Giáo viên" value="Giáo viên" />
-                <Select.Item label="Công nhân" value="Công nhân" />
-                <Select.Item
-                  label="Nhân viên văn phòng"
-                  value="Nhân viên văn phòng"
-                />
-              </Select>
+                isDisabled={!openEdit}
+                size={"lg"}
+                marginY={2}
+                _focus={{
+                  borderColor: Colors.primaryMintDark,
+                }}
+                InputLeftElement={
+                  <Icon
+                    as={FontAwesome}
+                    name="briefcase"
+                    size={5}
+                    color={Colors.primaryMintDark}
+                    marginLeft={2}
+                    marginRight={5}
+                  />
+                }
+              />
               <Text
                 fontSize="md"
                 marginY={2}
@@ -475,7 +483,11 @@ const UserInfo = ({ navigation }: any) => {
                 </Radio.Group>
               </View>
             </View>
-            <Heading size="md" style={{ marginVertical: 10 }}>
+            <Heading
+              size="md"
+              textAlign={"center"}
+              style={{ marginVertical: 10 }}
+            >
               Tiền sử bệnh của bản thân
             </Heading>
             <View>
@@ -770,7 +782,11 @@ const UserInfo = ({ navigation }: any) => {
                 </View>
               </Radio.Group>
             </View>
-            <Heading size="md" style={{ marginVertical: 10 }}>
+            <Heading
+              size="md"
+              textAlign={"center"}
+              style={{ marginVertical: 10 }}
+            >
               Tiền sử bệnh trong gia đình
             </Heading>
             <View>

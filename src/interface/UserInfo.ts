@@ -14,6 +14,7 @@ interface UserInfoProps {
   isGeneticDisease: boolean;
   isSmoke: boolean;
   isExercise: boolean;
+  avatar: string;
 }
 
 export default UserInfoProps;

@@ -5,31 +5,37 @@ import {
   Icon,
   Heading,
   Pressable,
-  Image,
+  Spinner,
+  ScrollView,
 } from "native-base";
 import React, { useContext, useEffect, useState } from "react";
 import { Colors } from "../../../theme/Theme";
 import { Dimensions } from "react-native";
 import { Octicons, FontAwesome6, AntDesign } from "@expo/vector-icons";
 import { AxiosContext } from "../../../context/AxiosContext";
-import { useIsFocused } from "@react-navigation/native";
-import { ExtractTime, FormatDate } from "../../../utils/DateFormatter";
+import {
+  ExtractTime,
+  FormatDateWithoutYear,
+} from "../../../utils/DateFormatter";
 import UserAssessmentProps from "./UserAssessmentProps";
-
-const { width, height } = Dimensions.get("window");
 
 const AssessmentHistory = ({ navigation }: any) => {
   const { authAxios }: any = useContext(AxiosContext);
-  const focus = useIsFocused();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [userAssessments, setUserAssessments] = useState<UserAssessmentProps[]>(
     []
   );
 
   const fetchUserAssessment = async () => {
     try {
+      setIsLoading(true);
       const response = await authAxios.get("/diagnose");
       if (response.data.message === "success") {
         setUserAssessments(response.data.data);
+        setIsLoading(false);
+      } else {
+        setIsLoading(false);
+        console.log("Error: ", response.data.message);
       }
     } catch (error) {
       console.log("Error: ", error);
@@ -37,10 +43,23 @@ const AssessmentHistory = ({ navigation }: any) => {
   };
 
   useEffect(() => {
-    if (focus) {
-      fetchUserAssessment();
-    }
-  }, [focus]);
+    fetchUserAssessment();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <View
+        width={"100%"}
+        position={"absolute"}
+        paddingY={"full"}
+        zIndex={999}
+        alignSelf={"center"}
+        style={{ backgroundColor: "rgba(255, 255, 255, 0.5)" }}
+      >
+        <Spinner color={Colors.primaryMintDark} size={50} />
+      </View>
+    );
+  }
   return (
     <View
       _dark={{
@@ -52,12 +71,13 @@ const AssessmentHistory = ({ navigation }: any) => {
       style={{ height: "100%", width: "100%" }}
     >
       {userAssessments.length > 0 ? (
-        <View style={{ height: "100%", width: "100%", padding: 10 }}>
+        <ScrollView style={{ height: "100%", width: "100%", padding: 10 }}>
+          {/* <ScrollView showsVerticalScrollIndicator={false}> */}
           <Divider
             position={"absolute"}
             orientation="vertical"
             bg={Colors.black}
-            left={"24"}
+            left={"20"}
           />
           <View
             display={"flex"}
@@ -88,10 +108,10 @@ const AssessmentHistory = ({ navigation }: any) => {
                     width={"10"}
                     fontSize={"md"}
                     fontWeight={"bold"}
-                    marginRight={"9"}
+                    marginRight={"7"}
                     marginTop={2}
                   >
-                    {FormatDate(assessment.createdDate.toString())}
+                    {FormatDateWithoutYear(assessment.createdDate.toString())}
                   </Text>
                   <Icon
                     as={Octicons}
@@ -174,7 +194,8 @@ const AssessmentHistory = ({ navigation }: any) => {
                 </View>
               ))}
           </View>
-        </View>
+          {/* </ScrollView> */}
+        </ScrollView>
       ) : (
         <View
           style={{

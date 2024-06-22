@@ -16,3 +16,8 @@ export const ExtractTime = (date: string) => {
   const dateObj = new Date(date);
   return `${dateObj.getHours()}:${dateObj.getMinutes()}`;
 };
+
+export const FormatDateWithoutYear = (date: string) => {
+  const dateObj = new Date(date);
+  return `${dateObj.getDate()}-${dateObj.getMonth() + 1}`;
+};

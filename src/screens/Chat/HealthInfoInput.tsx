@@ -15,6 +15,7 @@ import {
   ScrollView,
   Checkbox,
   useToast,
+  Spinner,
 } from "native-base";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { Colors } from "../../theme/Theme";
@@ -34,6 +35,7 @@ const HealthInfoInput = ({ navigation }: any) => {
   const [isOpen, setIsOpen] = useState(false);
   const cancelRef = useRef(null);
   const toast = useToast();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const { authAxios }: any = useContext(AxiosContext);
   // info
   const [address, setAddress] = useState<string>("");
@@ -101,7 +103,7 @@ const HealthInfoInput = ({ navigation }: any) => {
   const checkInput = (): boolean | undefined => {
     switch (currentStep) {
       case 0:
-        return address !== "" && job !== "";
+        return address !== "" && job !== "" && gender !== "";
       case 10:
         return disease !== undefined;
       case 20:
@@ -126,56 +128,74 @@ const HealthInfoInput = ({ navigation }: any) => {
   };
 
   const handleSuccess = async () => {
-    console.log({
-      address,
-      job,
-      gender,
-      disease,
-      treatment,
-      surgery,
-      surgeryType,
-      isToxic,
-      isEpidemic,
-      isGeneticDisease,
-      isSmoke,
-      isExercise,
-    });
-
-    const response = await authAxios.post("/patient/addPatient", {
-      address: address,
-      job: job,
-      gender: gender,
-      past_diseases: disease ? "Có" : "Không",
-      past_disease_treatment: treatment,
-      had_surgery: surgery ? "Có" : "Không",
-      surgery_type: surgeryType,
-      exposure_to_toxic_substances: isToxic ? "Có" : "Không",
-      visited_epidemic_areas: isEpidemic ? "Có" : "Không",
-      family_genetic_disease: isGeneticDisease ? "Có" : "Không",
-      family_cardiovascular_disease: isGeneticDisease ? "Có" : "Không",
-      family_malignant_disease: isGeneticDisease ? "Có" : "Không",
-      family_autoimmune_disease: isGeneticDisease ? "Có" : "Không",
-      uses_tobacco: isSmoke ? "Có" : "Không",
-      uses_alcohol: isSmoke ? "Có" : "Không",
-      uses_stimulants: isSmoke ? "Có" : "Không",
-      exercises_regularly: isExercise ? "Có" : "Không",
-    });
-
-    if (response.data.message === "success") {
-      toast.show({
-        render: () => (
-          <CustomToast
-            message="Cảm ơn bạn đã cung cấp thông tin sức khỏe của mình"
-            state="success"
-            onClose={() => {
-              toast.closeAll();
-            }}
-          />
-        ),
+    try {
+      console.log({
+        address,
+        job,
+        gender,
+        disease,
+        treatment,
+        surgery,
+        surgeryType,
+        isToxic,
+        isEpidemic,
+        isGeneticDisease,
+        isSmoke,
+        isExercise,
       });
-      navigation.navigate("TabBar");
-    } else {
-      console.log(response.data);
+      setIsLoading(true);
+      const response = await authAxios.post("/patient/addPatient", {
+        address: address,
+        job: job,
+        gender: gender,
+        past_diseases: disease ? "Có" : "Không",
+        past_disease_treatment: treatment,
+        had_surgery: surgery ? "Có" : "Không",
+        surgery_type: surgeryType,
+        exposure_to_toxic_substances: isToxic ? "Có" : "Không",
+        visited_epidemic_areas: isEpidemic ? "Có" : "Không",
+        family_genetic_disease: isGeneticDisease ? "Có" : "Không",
+        family_cardiovascular_disease: isGeneticDisease ? "Có" : "Không",
+        family_malignant_disease: isGeneticDisease ? "Có" : "Không",
+        family_autoimmune_disease: isGeneticDisease ? "Có" : "Không",
+        uses_tobacco: isSmoke ? "Có" : "Không",
+        uses_alcohol: isSmoke ? "Có" : "Không",
+        uses_stimulants: isSmoke ? "Có" : "Không",
+        exercises_regularly: isExercise ? "Có" : "Không",
+      });
+
+      if (response.data.message === "success") {
+        toast.show({
+          render: () => (
+            <CustomToast
+              message="Cảm ơn bạn đã cung cấp thông tin sức khỏe của mình"
+              state="success"
+              onClose={() => {
+                toast.closeAll();
+              }}
+            />
+          ),
+        });
+        setIsLoading(false);
+        navigation.navigate("TabBar");
+      } else {
+        console.log(response.data);
+        setIsLoading(false);
+        toast.show({
+          render: () => (
+            <CustomToast
+              message="Có lỗi xảy ra, vui lòng thử lại sau"
+              state="error"
+              onClose={() => {
+                toast.closeAll();
+              }}
+            />
+          ),
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      setIsLoading(false);
       toast.show({
         render: () => (
           <CustomToast
@@ -243,17 +263,18 @@ const HealthInfoInput = ({ navigation }: any) => {
         width: "100%",
       }}
     >
-      {/* <IconButton
-        position={"absolute"}
-        top={5}
-        right={5}
-        bg={Colors.primaryMint}
-        rounded={"full"}
-        zIndex={99}
-        _pressed={{ bg: "coolGray.400" }}
-        icon={<Icon as={AntDesign} name="close" color={Colors.white} />}
-        // onPress={() => navigation.dispatch(CommonActions.goBack())}
-      /> */}
+      {isLoading && (
+        <View
+          width={"100%"}
+          position={"absolute"}
+          paddingY={"full"}
+          zIndex={999}
+          alignSelf={"center"}
+          style={{ backgroundColor: "rgba(255, 255, 255, 0.5)" }}
+        >
+          <Spinner color={Colors.primaryMintDark} size={50} />
+        </View>
+      )}
       <WaveHeader />
       <ScrollView marginTop={50}>
         <View

@@ -5,11 +5,8 @@ import TabBar from "./TabBar";
 import Login from "./Authentication/Login/Login";
 import Signup from "./Authentication/Signup/Signup";
 import Home from "./HomePage/Home";
-import ForgetPassword from "./Authentication/Login/ForgetPassword";
-import VerifyCode from "./Authentication/Login/VerifyCode";
-import ResetPassword from "./Authentication/Login/ResetPassword";
 import Package from "./Profiles/Packages/Package";
-import { Spinner, useColorMode } from "native-base";
+import { useColorMode } from "native-base";
 import { Colors } from "../theme/Theme";
 import VerifyOTP from "./Authentication/Signup/VerifyOTP";
 import InputInfo from "./Authentication/Signup/InputInfo";
@@ -23,10 +20,8 @@ import {
   DefaultTheme,
 } from "@react-navigation/native";
 import Chat from "./Chat/Chat";
-import { AxiosContext } from "../context/AxiosContext";
 import Result from "./Chat/Result";
 import HealthInfoInput from "./Chat/HealthInfoInput";
-import Information from "./Information/Information";
 import AssessmentDetail from "./Profiles/AssessmentHistory/AssessmentDetail";
 
 const Stack = createNativeStackNavigator();
@@ -94,9 +89,6 @@ const Navigation = () => {
             component={Login}
             options={{
               title: "",
-              headerTransparent: true,
-              headerTintColor:
-                colorMode === "dark" ? Colors.white : Colors.black,
             }}
           />
           <Stack.Screen
@@ -104,25 +96,7 @@ const Navigation = () => {
             component={Signup}
             options={{
               title: "",
-              headerTransparent: true,
-              headerTintColor:
-                colorMode === "dark" ? Colors.white : Colors.black,
             }}
-          />
-          <Stack.Screen
-            name="ForgetPassword"
-            component={ForgetPassword}
-            options={{ title: "", headerTransparent: true }}
-          />
-          <Stack.Screen
-            name="VerifyCode"
-            component={VerifyCode}
-            options={{ title: "", headerTransparent: true }}
-          />
-          <Stack.Screen
-            name="ResetPassword"
-            component={ResetPassword}
-            options={{ title: "", headerTransparent: true }}
           />
           <Stack.Screen
             name="VerifyOTP"
@@ -186,16 +160,24 @@ const Navigation = () => {
             name="UserInfo"
             component={UserInfo}
             options={{
-              title: "",
-              headerTransparent: true,
+              title: "Thông tin cơ bản",
+              headerStyle: {
+                backgroundColor:
+                  colorMode === "dark" ? Colors.black : Colors.white,
+              },
+              headerTintColor:
+                colorMode === "dark" ? Colors.white : Colors.black,
             }}
           />
           <Stack.Screen
             name="AssessmentHistory"
             component={AssessmentHistory}
             options={{
-              title: "",
-              headerTransparent: true,
+              title: "Lịch sử chẩn đoán",
+              headerStyle: {
+                backgroundColor:
+                  colorMode === "dark" ? Colors.black : Colors.white,
+              },
               headerTintColor:
                 colorMode === "dark" ? Colors.white : Colors.black,
             }}
@@ -204,8 +186,11 @@ const Navigation = () => {
             name="AssessmentDetail"
             component={AssessmentDetail}
             options={{
-              title: "",
-              headerTransparent: true,
+              title: "Chi tiết chẩn đoán",
+              headerStyle: {
+                backgroundColor:
+                  colorMode === "dark" ? Colors.black : Colors.white,
+              },
               headerTintColor:
                 colorMode === "dark" ? Colors.white : Colors.black,
             }}
@@ -218,13 +203,6 @@ const Navigation = () => {
               animation: "default",
             }}
           />
-          {/* <Stack.Screen
-            name="Information"
-            component={Information}
-            options={{
-              headerShown: false,
-            }}
-          /> */}
         </Stack.Navigator>
       )}
     </NavigationContainer>

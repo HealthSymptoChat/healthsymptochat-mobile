@@ -37,6 +37,7 @@ const Login = ({ navigation }: any) => {
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [error, setError] = useState("");
   const authContext: any = useContext(AuthContext);
   const { publicAxios }: any = useContext(AxiosContext);
 
@@ -126,10 +127,10 @@ const Login = ({ navigation }: any) => {
 
   const onGoogleButtonPress = async () => {
     try {
-      setIsLoading(true);
       await GoogleSignin.hasPlayServices();
       const userInfo = await GoogleSignin.signIn();
 
+      setIsLoading(true);
       const response = await publicAxios.post("/auth/google", userInfo.user);
       try {
         if (response.data.message === "success") {
@@ -159,6 +160,7 @@ const Login = ({ navigation }: any) => {
         } else {
           setIsLoading(false);
           console.log(response.data.message);
+          // setError(response.data.message);
           toast.show({
             render: () => (
               <CustomToast
@@ -172,6 +174,7 @@ const Login = ({ navigation }: any) => {
           });
         }
       } catch (error: any) {
+        // setError(error);
         setIsLoading(false);
         console.log("Login failed", error);
       }
@@ -179,14 +182,18 @@ const Login = ({ navigation }: any) => {
       setIsLoading(false);
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
         // user cancelled the login flow
+        // setError("Đã hủy đăng nhập");
         console.log("cancelled");
       } else if (error.code === statusCodes.IN_PROGRESS) {
         // operation (e.g. sign in) is in progress already
+        // setError("Đang xử lý");
         console.log("in progress");
       } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
         // play services not available or outdated
+        // setError("Dịch vụ không khả dụng");
         console.log("play services not available");
       } else {
+        // setError(("Đã xảy ra lỗi" + error) as string);
         console.log("error", error);
       }
     }
@@ -305,6 +312,12 @@ const Login = ({ navigation }: any) => {
             </View>
           </Button> */}
         </View>
+
+        {/* {error && (
+          <Text style={{ color: "red", textAlign: "center", fontSize: 24 }}>
+            {error}
+          </Text>
+        )} */}
         <Button
           rounded="full"
           variant="link"
