@@ -24,22 +24,22 @@ const { width, height } = Dimensions.get("window");
 const data = [
   {
     title: "Chăm sóc sức khỏe mùa mưa",
-    description: "Chăm sóc sức khỏe mùa ...",
+    description: "Mùa mưa là thời điểm ...",
     image: require("../../../assets/rain.png"),
   },
   {
-    title: "Chăm sóc sức khỏe mùa mưa",
-    description: "Chăm sóc sức khỏe mùa ...",
+    title: "Cảnh báo nắng nóng 'Kỷ Lục' mùa hè 2024",
+    description: "Khi thời tiết khô, cơ thể dễ bị mất nước ...",
     image: require("../../../assets/summer.png"),
   },
   {
-    title: "Chăm sóc sức khỏe mùa mưa",
-    description: "Chăm sóc sức khỏe mùa ...",
+    title: "Cảnh báo gia tăng bệnh da liễu vào mùa hè",
+    description: "Mùa hè là thời điểm cơ thể dễ bị nổi mụn ...",
     image: require("../../../assets/fall.png"),
   },
   {
-    title: "Chăm sóc sức khỏe mùa mưa",
-    description: "Chăm sóc sức khỏe mùa ...",
+    title: "Chăm sóc sức khỏe mùa đông",
+    description: "Mùa đông là thời điểm cơ thể dễ bị cảm lạnh ...",
     image: require("../../../assets/winter.png"),
   },
 ];

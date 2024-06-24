@@ -221,9 +221,9 @@ const Chat = ({ navigation }: any) => {
 
   const isCurrentStepFilled =
     (currentStep === 0 && question1 !== "") ||
-    (currentStep === 10 && question2.length === 0 && question2Other === "") ||
+    (currentStep === 10 && question2.length !== 0 && question2Other !== "") ||
     (currentStep === 20 && question3 !== "") ||
-    (currentStep === 30 && question4.length === 0 && question4Other === "") ||
+    (currentStep === 30 && question4.length !== 0 && question4Other !== "") ||
     (currentStep === 40 && question5 !== "") ||
     (currentStep === 50 && question6 !== "") ||
     (currentStep === 60 && question7 !== "");

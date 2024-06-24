@@ -106,7 +106,7 @@ const Signup = ({ navigation }: any) => {
           }}
         />
         <View style={styles.header}>
-          <Heading>Chào mừng bạn đến với Healthsymptochat</Heading>
+          <Heading>Chào mừng bạn đến với HealthSymptochat</Heading>
           <Text fontSize="md">Đăng ký là người dùng mới của ứng dụng</Text>
         </View>
         <Text fontSize="md" style={{ margin: 10 }}>
